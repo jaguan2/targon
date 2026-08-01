@@ -1,0 +1,469 @@
+/*
+ * Palette and starfield per docs/RESEARCH.md §5.
+ *
+ * The background is deliberately CSS-only. The node graph will own the single
+ * requestAnimationFrame loop on the page; adding a second animated canvas
+ * behind it is the standard way this kind of page starts dropping frames on
+ * mobile.
+ */
+
+:root {
+  --void: #0a0e27;
+  --nebula: #1b1035;
+  --starlight: #f4f1ea;
+  --gold: #e8c87e;
+  --harmony: #7fd8c4;
+  --tension: #e87e9b;
+  --dim: #8a92b2;
+  --surface: rgba(255, 255, 255, 0.04);
+  --border: rgba(244, 241, 234, 0.14);
+
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--sans);
+  color: var(--starlight);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, #2d1b4e 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 20%, #1a2a5e 0%, transparent 55%),
+    linear-gradient(180deg, var(--void) 0%, var(--nebula) 55%, var(--void) 100%);
+  background-attachment: fixed;
+}
+
+/* --- Starfield -----------------------------------------------------------
+ * Three layers of stars, each a single element whose box-shadow carries every
+ * star. Positions are generated once at startup from a seeded PRNG (see
+ * starfield.ts) so the sky is stable across renders but not hand-authored.
+ */
+
+.starfield {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.starfield__layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: transparent;
+  animation: drift linear infinite;
+}
+
+.starfield__layer--far {
+  width: 1px;
+  height: 1px;
+  animation-duration: 240s;
+  opacity: 0.55;
+}
+
+.starfield__layer--mid {
+  width: 2px;
+  height: 2px;
+  animation-duration: 160s;
+  opacity: 0.75;
+}
+
+.starfield__layer--near {
+  width: 3px;
+  height: 3px;
+  animation-duration: 100s;
+}
+
+/* Each layer is duplicated one viewport lower, so when the first scrolls out
+ * the second is already in place and the loop is seamless. */
+@keyframes drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.starfield__twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 6rem;
+}
+
+.masthead {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.masthead h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.masthead p {
+  color: var(--dim);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.panel h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.4rem;
+  margin: 0 0 0.35rem;
+}
+
+.panel__hint {
+  color: var(--dim);
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+/* --- Form ---------------------------------------------------------------- */
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--dim);
+}
+
+.field input,
+.field select {
+  background: rgba(10, 14, 39, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  color: var(--starlight);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 1.75rem 0 0;
+}
+
+.fieldset > legend {
+  padding: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--dim);
+  margin-bottom: 0.85rem;
+}
+
+.optional-tag {
+  color: var(--gold);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+button.primary {
+  margin-top: 1.75rem;
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--gold);
+  color: #241b06;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+button.primary:hover {
+  filter: brightness(1.1);
+}
+
+/* --- Chart readout ------------------------------------------------------- */
+
+.big-three {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.big-three__card {
+  text-align: center;
+  padding: 1.25rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(10, 14, 39, 0.45);
+}
+
+.big-three__glyph {
+  font-size: 2rem;
+  color: var(--gold);
+  line-height: 1;
+  /* The glow that makes a placement read as a star rather than a table cell. */
+  text-shadow: 0 0 18px rgba(232, 200, 126, 0.55);
+}
+
+.big-three__label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  margin: 0.6rem 0 0.2rem;
+}
+
+.big-three__value {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+table.placements {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+table.placements th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--dim);
+  font-weight: 500;
+  padding-bottom: 0.6rem;
+}
+
+table.placements td {
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-top: 1px solid rgba(244, 241, 234, 0.07);
+}
+
+.glyph-cell {
+  color: var(--gold);
+  font-size: 1.1rem;
+  width: 2rem;
+}
+
+.retro {
+  color: var(--tension);
+  font-size: 0.78rem;
+  margin-left: 0.35rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* --- Compatibility ranking ----------------------------------------------- */
+
+.mode-switch {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mode-switch button {
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.mode-switch button[aria-pressed='true'] {
+  background: rgba(232, 200, 126, 0.14);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.ranking {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.rank-row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  background: rgba(10, 14, 39, 0.4);
+}
+
+.rank-row__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+
+.rank-row__glyph {
+  font-size: 1.3rem;
+  color: var(--gold);
+}
+
+.rank-row__name {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  flex: 1;
+}
+
+.rank-row__score {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+}
+
+/* Aspect quality is never carried by hue alone — the bar length and the
+ * printed aspect name both encode it, for colour-blind readers. */
+.rank-row__bar {
+  height: 3px;
+  border-radius: 2px;
+  margin: 0.7rem 0;
+  background: rgba(244, 241, 234, 0.1);
+  overflow: hidden;
+}
+
+.rank-row__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.quality-harmonious span {
+  background: var(--harmony);
+}
+.quality-challenging span {
+  background: var(--tension);
+}
+.quality-neutral span {
+  background: var(--gold);
+}
+
+.quality-harmonious .rank-row__score {
+  color: var(--harmony);
+}
+.quality-challenging .rank-row__score {
+  color: var(--tension);
+}
+.quality-neutral .rank-row__score {
+  color: var(--gold);
+}
+
+.rank-row__summary {
+  color: var(--dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.rank-row__factors {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.rank-row__factors li {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--dim);
+}
+
+.warning {
+  border-left: 2px solid var(--gold);
+  padding: 0.7rem 0 0.7rem 1rem;
+  color: var(--dim);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.footnote {
+  color: var(--dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+/* Respect the OS-level motion preference — twinkling and parallax are exactly
+ * the kind of thing that triggers vestibular discomfort. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
