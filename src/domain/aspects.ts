@@ -128,26 +128,12 @@ export const ASPECTS: readonly Aspect[] = [
   },
 ];
 
-const ASPECTS_BY_NAME = new Map<AspectName, Aspect>(
-  ASPECTS.map((a) => [a.name, a]),
-);
-
 /** Indexed 0–6 by whole-sign separation. */
 const ASPECTS_BY_SIGN_DISTANCE: readonly Aspect[] = (() => {
   const table = new Array<Aspect>(7);
   for (const aspect of ASPECTS) table[aspect.signDistance] = aspect;
   return table;
 })();
-
-export function getAspect(name: AspectName): Aspect {
-  const aspect = ASPECTS_BY_NAME.get(name);
-  if (!aspect) throw new Error(`Unknown aspect: ${name}`);
-  return aspect;
-}
-
-export const PTOLEMAIC_ASPECTS: readonly Aspect[] = ASPECTS.filter(
-  (a) => a.ptolemaic,
-);
 
 /**
  * Shortest distance between two signs, 0–6.
@@ -198,6 +184,11 @@ export interface AspectHit {
  * Unlike `aspectBetweenSigns`, this is what real synastry uses: two planets in
  * adjacent signs can still be conjunct if they sit either side of the cusp.
  * Returns the tightest match, or null when nothing lands inside orb.
+ *
+ * Not yet called by the app, which scores at sign level. Kept deliberately: it
+ * is the primitive degree-level synastry needs, it is fully tested, and it is
+ * the one place where the element/modality layer stops being redundant (see
+ * compatibility.ts). Delete it only if that direction is abandoned.
  */
 export function findAspect(
   longitudeA: number,
@@ -223,9 +214,3 @@ export function findAspect(
   }
   return best;
 }
-
-export const ASPECT_QUALITY_LABELS: Readonly<Record<AspectQuality, string>> = {
-  harmonious: 'Harmonious',
-  challenging: 'Challenging',
-  neutral: 'Dynamic',
-};

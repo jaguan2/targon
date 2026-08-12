@@ -2,27 +2,63 @@
   "name": "star",
   "private": true,
   "version": "0.1.0",
+  "description": "A birth chart, and the distances between signs.",
+  "author": "Jason",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "app": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --win",
+    "dist:dir": "npm run build && electron-builder --win --dir"
+  },
+  "build": {
+    "appId": "com.jason.star",
+    "productName": "Star",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "Star-${version}-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Star-${version}-setup.exe"
+    }
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
+    "d3-force": "^3.0.0",
     "luxon": "^3.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
+    "@types/d3-force": "^3.0.10",
     "@types/luxon": "^3.4.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.6.3",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"

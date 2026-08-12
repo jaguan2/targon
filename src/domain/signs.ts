@@ -221,8 +221,6 @@ export const SIGNS: readonly Sign[] = [
 
 const SIGNS_BY_NAME = new Map<SignName, Sign>(SIGNS.map((s) => [s.name, s]));
 
-export const SIGN_NAMES: readonly SignName[] = SIGNS.map((s) => s.name);
-
 /** Normalise any number of degrees into the 0–360 range. */
 export function normalizeDegrees(degrees: number): number {
   return ((degrees % 360) + 360) % 360;
@@ -273,13 +271,12 @@ export function formatLongitude(longitude: number): string {
  * Same element is the trine (easiest flow). Fire–air and earth–water are the
  * complementary pairs reached by sextile: air feeds fire, water nourishes earth.
  */
-export const COMPLEMENTARY_ELEMENTS: Readonly<Record<ElementName, ElementName>> =
-  {
-    fire: 'air',
-    air: 'fire',
-    earth: 'water',
-    water: 'earth',
-  };
+const COMPLEMENTARY_ELEMENTS: Readonly<Record<ElementName, ElementName>> = {
+  fire: 'air',
+  air: 'fire',
+  earth: 'water',
+  water: 'earth',
+};
 
 export function areElementsComplementary(
   a: ElementName,
@@ -287,19 +284,6 @@ export function areElementsComplementary(
 ): boolean {
   return COMPLEMENTARY_ELEMENTS[a] === b;
 }
-
-export const ELEMENT_LABELS: Readonly<Record<ElementName, string>> = {
-  fire: 'Fire',
-  earth: 'Earth',
-  air: 'Air',
-  water: 'Water',
-};
-
-export const MODALITY_LABELS: Readonly<Record<ModalityName, string>> = {
-  cardinal: 'Cardinal',
-  fixed: 'Fixed',
-  mutable: 'Mutable',
-};
 
 /** One-line gloss of what each element brings to a relationship. */
 export const ELEMENT_TEMPERAMENT: Readonly<Record<ElementName, string>> = {

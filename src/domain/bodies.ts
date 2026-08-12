@@ -32,7 +32,7 @@ export interface Body {
  * They say nothing about you as an individual, which is exactly why they carry
  * weight 1 and are excluded from compatibility scoring by default.
  */
-export const BODIES: readonly Body[] = [
+const BODIES: readonly Body[] = [
   {
     name: 'sun',
     label: 'Sun',
@@ -216,34 +216,3 @@ export function getBody(name: BodyName): Body {
 export const COMPUTABLE_BODIES: readonly Body[] = BODIES.filter(
   (b) => b.computable,
 );
-
-/** Rank of each tier, so we can ask "does tier X satisfy requirement Y?". */
-const TIER_RANK: Readonly<Record<PrecisionTier, number>> = {
-  date: 0,
-  time: 1,
-  place: 2,
-};
-
-export function tierSatisfies(
-  available: PrecisionTier,
-  required: PrecisionTier,
-): boolean {
-  return TIER_RANK[available] >= TIER_RANK[required];
-}
-
-/** Which bodies are meaningful given the birth data on hand. */
-export function bodiesForTier(tier: PrecisionTier): readonly Body[] {
-  return COMPUTABLE_BODIES.filter((b) => tierSatisfies(tier, b.requires));
-}
-
-/**
- * Worst-case sign error if we guess the time of day.
- *
- * Assuming noon puts us at most 12 hours from the truth, so a body can be off
- * by up to half a day's motion. Used to warn honestly about date-only charts:
- * the Sun barely moves (0.5°), but the Moon can be off by 6.6° — around a fifth
- * of a sign, which is why we ask for a birth time.
- */
-export function maxDriftWithoutTime(body: Body): number {
-  return Math.abs(body.dailyMotion) / 2;
-}

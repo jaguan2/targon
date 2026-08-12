@@ -8,7 +8,7 @@ import {
   signFromLongitude,
   type Sign,
 } from './signs';
-import { aspectBetweenSigns, findAspect, type Aspect } from './aspects';
+import { aspectBetweenSigns, type Aspect } from './aspects';
 import { getBody } from './bodies';
 
 /**
@@ -79,6 +79,19 @@ export const COMPATIBILITY_SCALE: Readonly<Record<number, number>> = {
 
 export const MIN_SIGN_SCORE = 20;
 export const MAX_SIGN_SCORE = 98;
+
+/**
+ * Where a score sits within the reachable range, 0–1.
+ *
+ * The single normalisation used by everything downstream — layout distance,
+ * node size, edge weight, bar width. Anchoring at 0 instead of MIN_SIGN_SCORE
+ * would leave a fifth of every bar permanently filled, since no pairing can
+ * score below 20.
+ */
+export function scoreFraction(score: number): number {
+  const span = MAX_SIGN_SCORE - MIN_SIGN_SCORE;
+  return clamp((score - MIN_SIGN_SCORE) / span, 0, 1);
+}
 
 function elementFactor(a: Sign, b: Sign): CompatibilityFactor {
   if (a.element === b.element) {
@@ -332,27 +345,5 @@ export function scoreToDistance(
   score: number,
   { min = 80, max = 320 }: { min?: number; max?: number } = {},
 ): number {
-  const span = MAX_SIGN_SCORE - MIN_SIGN_SCORE;
-  const normalized = clamp((score - MIN_SIGN_SCORE) / span, 0, 1);
-  return max - normalized * (max - min);
-}
-
-/**
- * Degree-level aspect between two placements.
- *
- * This is the layer where element/modality stop being redundant: planets in
- * adjacent signs can be conjunct across a cusp, and then the sign relationship
- * genuinely differs from the angular one.
- */
-export function scorePlacementPair(
-  longitudeA: number,
-  longitudeB: number,
-): { hit: ReturnType<typeof findAspect>; pairing: SignCompatibility } {
-  return {
-    hit: findAspect(longitudeA, longitudeB),
-    pairing: scoreSignPair(
-      signFromLongitude(longitudeA),
-      signFromLongitude(longitudeB),
-    ),
-  };
+  return max - scoreFraction(score) * (max - min);
 }

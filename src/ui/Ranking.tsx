@@ -1,53 +1,31 @@
-import { useMemo, useState } from 'react';
 import type { NatalChart } from '../domain/chart';
 import {
-  MAX_SIGN_SCORE,
-  MIN_SIGN_SCORE,
   MODE_LABELS,
-  rankSignsForChart,
+  scoreFraction,
+  type ChartSignCompatibility,
   type CompatibilityMode,
 } from '../domain/compatibility';
 
 interface Props {
   chart: NatalChart;
+  ranked: readonly ChartSignCompatibility[];
+  mode: CompatibilityMode;
+  availableModes: readonly CompatibilityMode[];
+  onModeChange: (mode: CompatibilityMode) => void;
 }
 
-const MODES: CompatibilityMode[] = ['general', 'romantic', 'friendship'];
-
-/**
- * Ranked compatibility against all twelve signs.
- *
- * The bar is scaled to the reachable score range rather than 0–100 — the
- * lowest possible pairing is 20, so anchoring at zero would leave a quarter of
- * every bar permanently filled and flatten the differences that matter.
- */
+/** Floored at 2% so the weakest pairing still shows a sliver of bar. */
 function barWidth(score: number): string {
-  const span = MAX_SIGN_SCORE - MIN_SIGN_SCORE;
-  const fraction = (score - MIN_SIGN_SCORE) / span;
-  return `${Math.max(2, Math.round(fraction * 100))}%`;
+  return `${Math.max(2, Math.round(scoreFraction(score) * 100))}%`;
 }
 
-export function Ranking({ chart }: Props) {
-  const [mode, setMode] = useState<CompatibilityMode>('general');
-
-  const ranked = useMemo(() => {
-    try {
-      return rankSignsForChart(chart, mode);
-    } catch {
-      // The chosen mode needs placements this chart does not have.
-      return [];
-    }
-  }, [chart, mode]);
-
-  const available = MODES.filter((m) => {
-    try {
-      rankSignsForChart(chart, m);
-      return true;
-    } catch {
-      return false;
-    }
-  });
-
+export function Ranking({
+  chart,
+  ranked,
+  mode,
+  availableModes,
+  onModeChange,
+}: Props) {
   return (
     <section className="panel">
       <h2>Compatibility</h2>
@@ -57,12 +35,12 @@ export function Ranking({ chart }: Props) {
       </p>
 
       <div className="mode-switch" role="group" aria-label="Compatibility lens">
-        {available.map((m) => (
+        {availableModes.map((m) => (
           <button
             key={m}
             type="button"
             aria-pressed={mode === m}
-            onClick={() => setMode(m)}
+            onClick={() => onModeChange(m)}
           >
             {MODE_LABELS[m]}
           </button>
@@ -71,8 +49,7 @@ export function Ranking({ chart }: Props) {
 
       <ol className="ranking">
         {ranked.map((entry) => {
-          const dominantAspect = entry.dominant?.pairing.aspect;
-          const quality = dominantAspect?.quality ?? 'neutral';
+          const quality = entry.dominant?.pairing.aspect.quality ?? 'neutral';
           return (
             <li
               className={`rank-row quality-${quality}`}
@@ -91,10 +68,11 @@ export function Ranking({ chart }: Props) {
               <p className="rank-row__summary">{entry.summary}</p>
 
               <ul className="rank-row__factors">
-                {entry.contributions.map((c) => (
-                  <li key={c.body}>
-                    {c.bodyLabel} · {c.pairing.aspect.label} ·{' '}
-                    {Math.round(c.weight * 100)}%
+                {entry.contributions.map((contribution) => (
+                  <li key={contribution.body}>
+                    {contribution.bodyLabel} ·{' '}
+                    {contribution.pairing.aspect.label} ·{' '}
+                    {Math.round(contribution.weight * 100)}%
                   </li>
                 ))}
               </ul>

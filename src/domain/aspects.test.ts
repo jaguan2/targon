@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   ASPECTS,
-  PTOLEMAIC_ASPECTS,
   angularSeparation,
   aspectBetweenSigns,
   findAspect,
@@ -21,8 +20,9 @@ describe('aspect table', () => {
     }
   });
 
-  it('lists exactly the five Ptolemaic aspects', () => {
-    expect(PTOLEMAIC_ASPECTS.map((a) => a.name).sort()).toEqual([
+  it('flags exactly the five Ptolemaic aspects', () => {
+    const ptolemaic = ASPECTS.filter((a) => a.ptolemaic);
+    expect(ptolemaic.map((a) => a.name).sort()).toEqual([
       'conjunction',
       'opposition',
       'sextile',

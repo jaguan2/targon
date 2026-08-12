@@ -8,15 +8,24 @@
  */
 
 :root {
-  --void: #0a0e27;
-  --nebula: #1b1035;
-  --starlight: #f4f1ea;
-  --gold: #e8c87e;
-  --harmony: #7fd8c4;
-  --tension: #e87e9b;
-  --dim: #8a92b2;
-  --surface: rgba(255, 255, 255, 0.04);
-  --border: rgba(244, 241, 234, 0.14);
+  /* A twilight-blue palette rather than near-black: softer, lighter, and
+   * easier to sit with. Every accent is desaturated a step from its pure form
+   * so nothing shouts against the background. */
+  --void: #1b2b4a;
+  --nebula: #2a3d63;
+  /* The lightest band, at the very top of the page. Capped here rather than
+   * lighter because the masthead subtitle sits directly on it in --dim, and a
+   * lighter value drops that below the 4.5:1 body-text threshold. */
+  --horizon: #2f4368;
+  --starlight: #f4f7fc;
+  --gold: #f4dcae;
+  --harmony: #93dcd0;
+  --tension: #eaa8bc;
+  --dim: #a8b6d4;
+  --surface: rgba(255, 255, 255, 0.06);
+  --border: rgba(244, 247, 252, 0.16);
+  /* Recessed fields and cards — a touch darker than the panel they sit in. */
+  --well: rgba(18, 30, 53, 0.42);
 
   --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -33,10 +42,12 @@ body {
   min-height: 100vh;
   font-family: var(--sans);
   color: var(--starlight);
+  /* A dusk sky: lighter toward the top, settling darker at the foot of the
+   * page, with two soft blooms rather than a hard vignette. */
   background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, #2d1b4e 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 20%, #1a2a5e 0%, transparent 55%),
-    linear-gradient(180deg, var(--void) 0%, var(--nebula) 55%, var(--void) 100%);
+    radial-gradient(ellipse 90% 55% at 50% -5%, #42597f 0%, transparent 62%),
+    radial-gradient(ellipse 65% 45% at 88% 12%, #3d5273 0%, transparent 58%),
+    linear-gradient(180deg, var(--horizon) 0%, var(--nebula) 42%, var(--void) 100%);
   background-attachment: fixed;
 }
 
@@ -131,8 +142,11 @@ body {
   margin: 0 0 0.5rem;
 }
 
+/* --starlight, not --dim: this sits directly on the brightest part of the
+ * background gradient, where --dim falls to about 2.9:1. */
 .masthead p {
-  color: var(--dim);
+  color: var(--starlight);
+  opacity: 0.86;
   margin: 0;
   font-size: 1.05rem;
 }
@@ -140,10 +154,12 @@ body {
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.75rem;
+  border-radius: 20px;
+  padding: 2rem;
   margin-bottom: 1.5rem;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  /* Soft and diffuse rather than a crisp drop shadow. */
+  box-shadow: 0 18px 48px -24px rgba(9, 16, 32, 0.55);
 }
 
 .panel h2 {
@@ -182,13 +198,23 @@ body {
 
 .field input,
 .field select {
-  background: rgba(10, 14, 39, 0.6);
+  background: var(--well);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
   color: var(--starlight);
   font: inherit;
   font-size: 0.95rem;
+  transition: border-color 0.15s ease;
+}
+
+.field input:hover,
+.field select:hover {
+  border-color: rgba(244, 247, 252, 0.3);
+}
+
+.field input::placeholder {
+  color: rgba(168, 182, 212, 0.55);
 }
 
 .field input:focus-visible,
@@ -240,6 +266,161 @@ button.primary:hover {
   filter: brightness(1.1);
 }
 
+button.secondary {
+  margin-top: 1.75rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+button.secondary:hover {
+  color: var(--starlight);
+  border-color: var(--starlight);
+}
+
+/* --- Onboarding steps ---------------------------------------------------- */
+
+.step-count {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin: 0 0 0.6rem;
+}
+
+/* --- "Tell us about yourself" -------------------------------------------- */
+
+.panel--intro {
+  padding: 2.75rem 2rem 2rem;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 2.25rem;
+}
+
+.intro__mark {
+  width: 120px;
+  height: 56px;
+  margin-bottom: 1.25rem;
+  filter: drop-shadow(0 0 8px rgba(244, 220, 174, 0.45));
+}
+
+.intro h2 {
+  font-size: 1.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.intro__lede {
+  color: var(--dim);
+  font-size: 0.97rem;
+  line-height: 1.65;
+  margin: 0 auto;
+  max-width: 30rem;
+}
+
+/* The single most important field on the step, so it gets room to breathe. */
+.field--feature {
+  max-width: 24rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.field--feature label {
+  text-align: center;
+}
+
+.field--feature input {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  text-align: center;
+  padding: 0.85rem 1rem;
+}
+
+.fieldset--centred {
+  text-align: center;
+}
+
+.fieldset--centred > legend {
+  width: 100%;
+  text-align: center;
+}
+
+.chip-row--centred {
+  justify-content: center;
+}
+
+.intro__skip {
+  text-align: center;
+  color: var(--dim);
+  font-size: 0.83rem;
+  margin: 1rem 0 0;
+}
+
+.step-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* The submit button carries the weight; Back stays a quiet escape hatch. */
+.step-actions .primary {
+  flex: 1;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.chip:hover {
+  color: var(--starlight);
+}
+
+.chip[aria-pressed='true'] {
+  background: rgba(232, 200, 126, 0.14);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.profile-summary {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--starlight);
+  margin: 0 auto 2rem;
+  max-width: 34rem;
+}
+
+.restart {
+  display: flex;
+  justify-content: center;
+}
+
 /* --- Chart readout ------------------------------------------------------- */
 
 .big-three {
@@ -254,7 +435,7 @@ button.primary:hover {
   padding: 1.25rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(10, 14, 39, 0.45);
+  background: var(--well);
 }
 
 .big-three__glyph {
@@ -354,7 +535,7 @@ table.placements td {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.9rem 1.1rem;
-  background: rgba(10, 14, 39, 0.4);
+  background: var(--well);
 }
 
 .rank-row__head {
@@ -437,6 +618,138 @@ table.placements td {
   border-radius: 999px;
   border: 1px solid var(--border);
   color: var(--dim);
+}
+
+/* --- Star chart ---------------------------------------------------------- */
+
+.star-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  margin: 0 auto 1.5rem;
+  overflow: visible;
+}
+
+.ring-sector {
+  fill: rgba(244, 241, 234, 0.03);
+  stroke: rgba(244, 241, 234, 0.12);
+  stroke-width: 0.75;
+}
+
+/* Element tinting is decorative only — every sector is also labelled with its
+ * glyph, so nothing depends on telling these four apart by colour. */
+.ring-sector--fire {
+  fill: rgba(232, 126, 126, 0.07);
+}
+.ring-sector--earth {
+  fill: rgba(126, 232, 173, 0.06);
+}
+.ring-sector--air {
+  fill: rgba(232, 213, 126, 0.06);
+}
+.ring-sector--water {
+  fill: rgba(126, 173, 232, 0.07);
+}
+
+.ring-glyph {
+  fill: var(--starlight);
+  font-size: 26px;
+  opacity: 0.75;
+}
+
+.natal-tick {
+  stroke: var(--gold);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.natal-glyph {
+  fill: var(--gold);
+  font-size: 17px;
+  cursor: help;
+}
+
+.star-node {
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+
+.star-node:focus-visible {
+  outline: none;
+}
+
+.star-node:focus-visible circle {
+  stroke: var(--starlight);
+  stroke-width: 2.5;
+}
+
+.star-node circle {
+  transition: opacity 0.2s ease;
+}
+
+.star-node:hover circle {
+  opacity: 1;
+}
+
+.node-glyph {
+  fill: var(--void);
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.node-label {
+  fill: var(--dim);
+  font-size: 13px;
+  font-family: var(--serif);
+  pointer-events: none;
+}
+
+.selection {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+.selection h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.3rem;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.selection__score {
+  margin-left: auto;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.selection__factors {
+  list-style: none;
+  padding: 0;
+  margin: 1.1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.selection__factors li {
+  font-size: 0.9rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--border);
+}
+
+.selection__factors strong {
+  font-weight: 600;
+}
+
+.selection__factors p {
+  color: var(--dim);
+  margin: 0.35rem 0 0;
+  line-height: 1.55;
 }
 
 .warning {

@@ -83,7 +83,7 @@ const ASTRO_BODY: Partial<Record<BodyName, AstroBody>> = {
  * arcseconds, far below anything that could shift a house cusp into a
  * different sign.
  */
-export function meanObliquity(time: AstroTime): number {
+function meanObliquity(time: AstroTime): number {
   const t = time.tt / 36525;
   return (
     23.43929111 -
@@ -97,7 +97,7 @@ export function meanObliquity(time: AstroTime): number {
  * Mean rather than true node — it is the default in most astrology software,
  * and the true node's wobble (up to ~1.5°) rarely changes the sign.
  */
-export function meanLunarNode(time: AstroTime): number {
+function meanLunarNode(time: AstroTime): number {
   const t = time.tt / 36525;
   return normalizeDegrees(
     125.0445479 -
@@ -109,7 +109,7 @@ export function meanLunarNode(time: AstroTime): number {
 }
 
 /** Geocentric ecliptic longitude of a body, in degrees of the zodiac. */
-export function geocentricLongitude(body: AstroBody, time: AstroTime): number {
+function geocentricLongitude(body: AstroBody, time: AstroTime): number {
   if (body === AstroBody.Sun) return normalizeDegrees(SunPosition(time).elon);
   // `true` applies aberration correction — the apparent position, which is
   // what an ephemeris (and therefore a chart) reports.
@@ -200,7 +200,7 @@ function placidusCusp(
  * Opposite houses are always exactly 180° apart, so only six cusps are
  * genuinely computed in the quadrant systems.
  */
-export function computeHouses(
+function computeHouses(
   system: HouseSystem,
   ascendant: number,
   midheaven: number,

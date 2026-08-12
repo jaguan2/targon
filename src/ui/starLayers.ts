@@ -20,12 +20,12 @@ function seededRandom(seed: number): () => number {
 }
 
 /** Vertical span of one tile. Must match the `drift` keyframe distance. */
-export const TILE_HEIGHT = 2000;
+const TILE_HEIGHT = 2000;
 
 /** Horizontal span. Generous enough to cover ultrawide displays. */
 const TILE_WIDTH = 3200;
 
-export interface StarLayerOptions {
+interface StarLayerOptions {
   count: number;
   seed: number;
   /** Base star colour. A few stars are tinted warm to break up the white. */
@@ -42,7 +42,8 @@ export interface StarLayerOptions {
 export function buildStarLayer({
   count,
   seed,
-  color = '#f4f1ea',
+  // Matches --starlight; kept in sync with the palette in styles.css.
+  color = '#f4f7fc',
 }: StarLayerOptions): string {
   const random = seededRandom(seed);
   const shadows: string[] = [];
@@ -51,7 +52,7 @@ export function buildStarLayer({
     const x = Math.round(random() * TILE_WIDTH);
     const y = Math.round(random() * TILE_HEIGHT);
     // Roughly one star in six takes the warm tint, echoing the gold accent.
-    const tint = random() < 0.16 ? '#e8c87e' : color;
+    const tint = random() < 0.16 ? '#f4dcae' : color;
     shadows.push(`${x}px ${y}px ${tint}`);
     shadows.push(`${x}px ${y + TILE_HEIGHT}px ${tint}`);
   }

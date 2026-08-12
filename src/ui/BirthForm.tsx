@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import type { BirthInput } from '../domain/chart';
+import { greetingName, type Profile } from '../domain/profile';
 import { CITIES } from './cities';
 
 interface Props {
+  profile: Profile;
   onSubmit: (input: BirthInput) => void;
+  onBack: () => void;
 }
 
 const MANUAL = '__manual__';
@@ -16,7 +19,7 @@ const MANUAL = '__manual__';
  * is a bad trade. The chart degrades tier by tier instead, and says what each
  * missing field would unlock.
  */
-export function BirthForm({ onSubmit }: Props) {
+export function BirthForm({ profile, onSubmit, onBack }: Props) {
   const [date, setDate] = useState('1990-07-04');
   const [time, setTime] = useState('');
   const [city, setCity] = useState('');
@@ -74,9 +77,15 @@ export function BirthForm({ onSubmit }: Props) {
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>Your birth data</h2>
+      <p className="step-count">Step 2 of 2</p>
+      <h2>
+        {greetingName(profile)
+          ? `Now the sky, ${greetingName(profile)}`
+          : 'Now the sky'}
+      </h2>
       <p className="panel__hint">
-        Everything is calculated in your browser. Nothing is uploaded anywhere.
+        Only the date is required. Everything is calculated on this device —
+        nothing is uploaded anywhere.
       </p>
 
       <div className="field-grid">
@@ -162,9 +171,14 @@ export function BirthForm({ onSubmit }: Props) {
         </p>
       )}
 
-      <button className="primary" type="submit">
-        Chart it
-      </button>
+      <div className="step-actions">
+        <button className="secondary" type="button" onClick={onBack}>
+          Back
+        </button>
+        <button className="primary" type="submit">
+          Chart it
+        </button>
+      </div>
     </form>
   );
 }
