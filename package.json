@@ -6,16 +6,27 @@
   "author": "Jason",
   "type": "module",
   "main": "electron/main.cjs",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
+    "dev:web": "vite --host 127.0.0.1",
+    "dev:desktop": "node scripts/desktop.mjs --dev",
     "build": "tsc -b && vite build",
+    "build:web": "npm run build",
+    "package:web": "npm run build:web && node scripts/package-web.mjs",
     "preview": "vite preview",
+    "preview:web": "vite preview --host 127.0.0.1",
     "test": "vitest run",
+    "test:desktop": "node --test scripts/navigation.test.cjs",
+    "smoke:desktop": "node scripts/smoke-desktop.mjs",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "app": "npm run build && electron .",
-    "dist": "npm run build && electron-builder --win",
-    "dist:dir": "npm run build && electron-builder --win --dir"
+    "app": "npm run build:web && node scripts/desktop.mjs",
+    "dist": "npm run dist:win",
+    "dist:win": "npm run build:web && electron-builder --win --x64 --publish never",
+    "dist:dir": "npm run build:web && electron-builder --win --x64 --dir --publish never"
   },
   "build": {
     "appId": "com.jason.star",
@@ -59,6 +70,8 @@
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^43.4.0",
     "electron-builder": "^26.15.3",
+    "fflate": "^0.8.3",
+    "jsdom": "^26.1.0",
     "typescript": "^5.6.3",
     "vite": "^6.0.3",
     "vitest": "^2.1.8"

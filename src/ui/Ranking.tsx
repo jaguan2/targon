@@ -83,7 +83,7 @@ export function Ranking({
 
       {ranked[0]?.missing.length ? (
         <p className="warning">
-          Add a birth {chart.tier === 'date' ? 'time' : 'place'} to bring your{' '}
+          Add a birth {chart.tier === 'date' ? chart.input.latitude === undefined ? 'time and place' : 'time' : 'place'} in Profile to bring your{' '}
           {ranked[0].missing.join(' and ')} into the scoring.
         </p>
       ) : null}

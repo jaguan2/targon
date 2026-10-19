@@ -79,7 +79,7 @@ export function StarChart({ chart, ranked, title = 'Your sky' }: Props) {
   // Placements sit on the ring at their true longitude — this is the user's
   // actual chart, not a decoration.
   const placements = [...chart.placements.values()].filter(
-    (p) => p.body !== 'ascendant' && p.body !== 'midheaven',
+    (p) => getBody(p.body).class !== 'angle',
   );
 
   return (

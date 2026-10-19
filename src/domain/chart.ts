@@ -40,6 +40,8 @@ export interface BirthInput {
    * regions that have since changed them.
    */
   timeZone?: string;
+  /** Select the first or second occurrence when daylight saving repeats a time. */
+  timeOccurrence?: 'earlier' | 'later';
 }
 
 export type HouseSystem = 'whole-sign' | 'equal' | 'placidus';
@@ -57,7 +59,7 @@ export interface NatalChart {
   houseSystem: HouseSystem;
   /** Local sidereal time in degrees (RAMC). Null below `place` tier. */
   ramc: number | null;
-  /** True obliquity of the ecliptic at the birth moment. */
+  /** Mean obliquity of the ecliptic at the birth moment. */
   obliquity: number;
   /** Anything the caller should show a caveat about. */
   warnings: readonly string[];
@@ -294,14 +296,35 @@ function resolveTier(input: BirthInput): PrecisionTier {
  * region that has since changed its rules will be an hour out if you apply
  * today's offset, and an hour moves the Ascendant by ~15°.
  */
-function resolveUtc(input: BirthInput): { utc: Date; timeZone: string } {
+export function resolveBirthMoment(input: BirthInput): { utc: Date; timeZone: string } {
+  if (![input.year, input.month, input.day].every(Number.isInteger) ||
+      input.year < 1 || input.year > 9999) {
+    throw new Error('Invalid birth date. Enter a year between 1 and 9999.');
+  }
+  if ((input.hour !== undefined && (!Number.isInteger(input.hour) || input.hour < 0 || input.hour > 23)) ||
+      (input.minute !== undefined && (!Number.isInteger(input.minute) || input.minute < 0 || input.minute > 59)) ||
+      (input.minute !== undefined && input.hour === undefined)) {
+    throw new Error('Invalid birth time. Use hours 00–23 and minutes 00–59.');
+  }
+  if ((input.latitude === undefined) !== (input.longitude === undefined)) {
+    throw new Error('Enter both latitude and longitude for a birth place.');
+  }
+  if (input.latitude !== undefined && (!Number.isFinite(input.latitude) || Math.abs(input.latitude) > 90)) {
+    throw new Error('Latitude must be between -90 and 90.');
+  }
+  if (input.longitude !== undefined && (!Number.isFinite(input.longitude) || Math.abs(input.longitude) > 180)) {
+    throw new Error('Longitude must be between -180 and 180.');
+  }
+  if (input.timeOccurrence !== undefined && !['earlier', 'later'].includes(input.timeOccurrence)) {
+    throw new Error('Choose the first or second occurrence of the birth time.');
+  }
   const timeZone =
     input.timeZone ??
     (input.latitude !== undefined && input.longitude !== undefined
       ? tzLookup(input.latitude, input.longitude)
       : 'UTC');
 
-  const local = DateTime.fromObject(
+  let local = DateTime.fromObject(
     {
       year: input.year,
       month: input.month,
@@ -316,6 +339,22 @@ function resolveUtc(input: BirthInput): { utc: Date; timeZone: string } {
 
   if (!local.isValid) {
     throw new Error(`Invalid birth date/time: ${local.invalidReason ?? 'unknown'}`);
+  }
+
+  // Luxon moves nonexistent clock times forward during a DST jump. A birth
+  // chart must never silently replace the time the user supplied.
+  if (local.year !== input.year || local.month !== input.month || local.day !== input.day ||
+      local.hour !== (input.hour ?? 12) || local.minute !== (input.minute ?? 0)) {
+    throw new Error('That local time does not exist in this timezone because the clocks changed. Check the birth time or timezone.');
+  }
+  if (input.hour !== undefined) {
+    const possibilities = local.getPossibleOffsets().sort((a, b) => a.toMillis() - b.toMillis());
+    if (possibilities.length > 1) {
+      if (!input.timeOccurrence) {
+        throw new Error('That birth time occurred twice when the clocks changed. Choose its first or second occurrence under clock-change options.');
+      }
+      local = possibilities[input.timeOccurrence === 'earlier' ? 0 : possibilities.length - 1]!;
+    }
   }
 
   return { utc: local.toUTC().toJSDate(), timeZone };
@@ -344,19 +383,25 @@ export function computeChart(
 ): NatalChart {
   const houseSystem = options.houseSystem ?? 'whole-sign';
   const tier = resolveTier(input);
-  const { utc, timeZone } = resolveUtc(input);
+  const { utc, timeZone } = resolveBirthMoment(input);
   const time = MakeTime(utc);
   const obliquity = meanObliquity(time);
   const warnings: string[] = [];
 
   if (tier === 'date') {
     warnings.push(
-      'No birth time given, so noon was assumed. The Moon can be up to 6.6° off — around a fifth of a sign — and the Ascendant cannot be calculated at all.',
+      'No birth time given, so noon was assumed. Planetary positions are estimates; the Moon or any placement near a sign boundary may change. Rising, Descendant, Midheaven and houses need a birth time and place.',
     );
   } else if (tier === 'time') {
     warnings.push(
-      'No birth place given, so the Ascendant, Midheaven and houses are unavailable.',
+      'No birth place given, so the Ascendant, Descendant, Midheaven, Imum Coeli and houses are unavailable.',
     );
+  }
+  if (!input.timeZone && input.latitude === undefined) {
+    warnings.push('No birth timezone or place supplied, so UTC was assumed. Add the birth place or historical timezone for more reliable positions.');
+  }
+  if (input.year < 1900 && input.latitude !== undefined && !input.timeZone) {
+    warnings.push('Historical timezone rules may use a regional local mean time. For births before standard time, verify the original time convention and supply a timezone override if needed.');
   }
 
   let ramc: number | null = null;
@@ -368,6 +413,10 @@ export function computeChart(
   if (tier === 'place') {
     const latitude = input.latitude as number;
     const longitude = input.longitude as number;
+
+    if (Math.abs(latitude) === 90) {
+      throw new Error('Rising and setting points are undefined at the geographic poles. Check the birth coordinates.');
+    }
 
     // SiderealTime returns Greenwich apparent sidereal time in hours; adding
     // the observer's longitude gives local sidereal time, and ×15 converts
@@ -432,7 +481,9 @@ export function computeChart(
   }
 
   if (ascendant !== null) record('ascendant', ascendant, false);
+  if (ascendant !== null) record('descendant', normalizeDegrees(ascendant + 180), false);
   if (midheaven !== null) record('midheaven', midheaven, false);
+  if (midheaven !== null) record('imumCoeli', normalizeDegrees(midheaven + 180), false);
 
   return {
     input,

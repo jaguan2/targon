@@ -5,25 +5,30 @@ import type { BodyName } from '../domain/types';
 
 interface Props {
   chart: NatalChart;
+  title?: string;
 }
 
-const BIG_THREE: BodyName[] = ['sun', 'moon', 'ascendant'];
+const PRIMARY_POINTS: BodyName[] = ['sun', 'moon', 'ascendant', 'descendant', 'midheaven', 'imumCoeli'];
 
-const BIG_THREE_CAPTIONS: Record<string, string> = {
-  sun: 'Identity',
-  moon: 'Inner life',
+const POINT_CAPTIONS: Record<string, string> = {
+  sun: 'Sun · Identity',
+  moon: 'Moon · Inner life',
   ascendant: 'Rising',
+  descendant: 'Setting · Descendant',
+  midheaven: 'Midheaven',
+  imumCoeli: 'Roots · Imum Coeli',
 };
 
-export function ChartReadout({ chart }: Props) {
+export function ChartReadout({ chart, title = 'Your signs & placements' }: Props) {
   const rows = [...chart.placements.values()];
 
   return (
     <section className="panel">
-      <h2>Your chart</h2>
+      <h2>{title}</h2>
       <p className="panel__hint">
-        {chart.utc.toUTCString()} · {chart.timeZone} ·{' '}
-        {chart.houses ? `${chart.houseSystem} houses` : 'no houses (birth place not given)'}
+        {chart.tier === 'date' ? 'Reference moment (assumed noon): ' : 'Birth moment: '}
+        {chart.utc.toUTCString()} · {chart.timeZone} · Tropical zodiac ·{' '}
+        {chart.houses ? `${chart.houseSystem} houses` : 'houses need a birth time and place'}
       </p>
 
       {chart.warnings.map((warning) => (
@@ -33,27 +38,29 @@ export function ChartReadout({ chart }: Props) {
       ))}
 
       <div className="big-three">
-        {BIG_THREE.map((name) => {
+        {PRIMARY_POINTS.map((name) => {
           const placement = chart.placements.get(name);
           const body = getBody(name);
           return (
             <div className="big-three__card" key={name}>
               <div className="big-three__glyph">{body.glyph}</div>
               <div className="big-three__label">
-                {BIG_THREE_CAPTIONS[name] ?? body.label}
+                {POINT_CAPTIONS[name] ?? body.label}
               </div>
               <div className="big-three__value">
                 {placement ? (
                   <>
                     {getSignByName(placement.sign).glyph}{' '}
                     {getSignByName(placement.sign).label}
+                    {chart.tier === 'date' && <small className="placement-status">Estimated at noon</small>}
                   </>
                 ) : (
                   <span style={{ color: 'var(--dim)', fontSize: '0.9rem' }}>
-                    needs birth {name === 'moon' ? 'time' : 'place'}
+                    needs birth {chart.input.hour === undefined ? chart.input.latitude === undefined ? 'time and place' : 'time' : 'place'}
                   </span>
                 )}
               </div>
+              <p className="placement-meaning">Traditionally: {body.governs}.</p>
             </div>
           );
         })}
@@ -64,7 +71,7 @@ export function ChartReadout({ chart }: Props) {
           <thead>
             <tr>
               <th colSpan={2}>Body</th>
-              <th>Position</th>
+              <th>Position{chart.tier === 'date' ? ' (estimated)' : ''}</th>
               <th>House</th>
               <th>Governs</th>
             </tr>

@@ -3,12 +3,14 @@ import {
   computeAscendant,
   computeChart,
   computeMidheaven,
+  resolveBirthMoment,
   houseOf,
   placementOf,
   type BirthInput,
 } from './chart';
 import { formatLongitude, normalizeDegrees, signFromLongitude } from './signs';
 import type { BodyName } from './types';
+import { Horizon, Observer, RotateVector, Rotation_ECT_EQD, SphereFromVector, Spherical, VectorFromSphere } from 'astronomy-engine';
 
 /**
  * Einstein's chart is the standard worked example: an AA (birth-certificate)
@@ -178,6 +180,31 @@ describe('precision tiers', () => {
 });
 
 describe('timezone handling', () => {
+  it('uses the birth place timezone even when time is unknown', () => {
+    const chart = computeChart({ year: 1990, month: 7, day: 4, latitude: 40.7128, longitude: -74.006 });
+    expect(chart.utc.toISOString()).toBe('1990-07-04T16:00:00.000Z');
+    expect(chart.tier).toBe('date');
+    expect(chart.placements.has('descendant')).toBe(false);
+  });
+
+  it('warns rather than hiding a UTC assumption', () => {
+    expect(computeChart({ year: 1990, month: 7, day: 4, hour: 14 }).warnings.join(' ')).toContain('UTC was assumed');
+  });
+
+  it('rejects a nonexistent local clock time during the spring DST jump', () => {
+    expect(() => resolveBirthMoment({ year: 2024, month: 3, day: 10, hour: 2, minute: 30, timeZone: 'America/New_York' })).toThrow(/does not exist/);
+  });
+
+  it('requires a choice when the local clock repeats during the autumn change', () => {
+    expect(() => resolveBirthMoment({ year: 2024, month: 11, day: 3, hour: 1, minute: 30, timeZone: 'America/New_York' })).toThrow(/occurred twice/);
+  });
+
+  it('resolves the two occurrences to distinct UTC instants', () => {
+    const input = { year: 2024, month: 11, day: 3, hour: 1, minute: 30, timeZone: 'America/New_York' };
+    expect(resolveBirthMoment({ ...input, timeOccurrence: 'earlier' }).utc.toISOString()).toBe('2024-11-03T05:30:00.000Z');
+    expect(resolveBirthMoment({ ...input, timeOccurrence: 'later' }).utc.toISOString()).toBe('2024-11-03T06:30:00.000Z');
+  });
+
   it('derives the zone from coordinates', () => {
     const chart = computeChart({
       year: 1990,
@@ -211,6 +238,52 @@ describe('timezone handling', () => {
     expect(() =>
       computeChart({ year: 1990, month: 13, day: 45, timeZone: 'UTC' }),
     ).toThrow(/Invalid birth date/);
+  });
+});
+
+describe('chart angles and input integrity', () => {
+  // Independent coordinate transforms check the handwritten horizon formula,
+  // rather than merely deriving a second value from that same formula.
+  it.each([
+    { latitude: 40.7128, longitude: -74.006, hour: 0 },
+    { latitude: -33.8688, longitude: 151.2093, hour: 8 },
+    { latitude: 0, longitude: 0, hour: 12 },
+    { latitude: 51.5074, longitude: -0.1278, hour: 20 },
+  ])('puts the Rising point on the eastern horizon at %j', (location) => {
+    const chart = computeChart({ year: 2000, month: 1, day: 1, ...location, timeZone: 'UTC' });
+    const vector = VectorFromSphere(new Spherical(0, placementOf(chart, 'ascendant').longitude, 1), chart.utc);
+    const equatorial = SphereFromVector(RotateVector(Rotation_ECT_EQD(chart.utc), vector));
+    const horizon = Horizon(chart.utc, new Observer(location.latitude, location.longitude, 0), equatorial.lon / 15, equatorial.lat);
+    // The engine uses true obliquity; our formula uses mean obliquity.
+    expect(Math.abs(horizon.altitude)).toBeLessThan(0.01);
+    expect(horizon.azimuth).toBeGreaterThan(0);
+    expect(horizon.azimuth).toBeLessThan(180);
+  });
+
+  it('places Descendant and IC exactly opposite Ascendant and Midheaven', () => {
+    const chart = computeChart(EINSTEIN);
+    expect(arcminutesApart(placementOf(chart, 'descendant').longitude, placementOf(chart, 'ascendant').longitude + 180)).toBeLessThan(0.0001);
+    expect(arcminutesApart(placementOf(chart, 'imumCoeli').longitude, placementOf(chart, 'midheaven').longitude + 180)).toBeLessThan(0.0001);
+  });
+
+  it.each([
+    { latitude: NaN, longitude: 0 },
+    { latitude: 91, longitude: 0 },
+    { latitude: 40 },
+    { latitude: 0, longitude: Infinity },
+    { latitude: 0, longitude: 181 },
+    { hour: 24 },
+    { hour: 1, minute: 60 },
+    { minute: 20 },
+    { year: NaN },
+    { month: 2, day: 30 },
+    { timeZone: 'Invalid/Timezone' },
+  ])('rejects invalid input %j', (patch) => {
+    expect(() => computeChart({ year: 2000, month: 1, day: 1, ...patch })).toThrow();
+  });
+
+  it('does not compute undefined polar horizon angles', () => {
+    expect(() => computeChart({ year: 2000, month: 1, day: 1, hour: 12, latitude: 90, longitude: 0 })).toThrow(/geographic poles/);
   });
 });
 

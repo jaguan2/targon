@@ -185,10 +185,8 @@ export interface AspectHit {
  * adjacent signs can still be conjunct if they sit either side of the cusp.
  * Returns the tightest match, or null when nothing lands inside orb.
  *
- * Not yet called by the app, which scores at sign level. Kept deliberately: it
- * is the primitive degree-level synastry needs, it is fully tested, and it is
- * the one place where the element/modality layer stops being redundant (see
- * compatibility.ts). Delete it only if that direction is abandoned.
+ * Used by the Friends chart comparison for known birth times. The generic
+ * twelve-sign exploration continues to use sign-level scoring.
  */
 export function findAspect(
   longitudeA: number,

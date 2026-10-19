@@ -9,17 +9,40 @@ and as a force-directed constellation.
 Everything runs locally. No API, no accounts, no network. Birth data never
 leaves the device.
 
+The **Profile** tab shows Sun, Moon, Rising, Descendant, Midheaven, Imum Coeli,
+and planetary placements. Edit your name and birth details there, or opt in to
+remembering the profile on this device. Unknown birth times produce clearly
+labelled estimates; time-dependent angles and houses stay unavailable.
+
+The **Friends** tab lets you add, edit, compare, and remove local birth profiles.
+It compares selected placements across both charts, with Friendship, Overall,
+and Romantic lenses. Known birth times enable degree-based aspects; missing
+times use a clearly labelled, provisional sign comparison. Removal has an Undo
+action. The profile's remember preference also controls friends' persistence.
+
+The **Compatibility** tab remains an exploration of your chart against twelve
+generic signs. See [the friends model](docs/FRIENDS.md) for the two-person scoring
+rules and their limits.
+
+See [the profile and logic audit](docs/PROFILE-LOGIC.md) for required inputs,
+timezone handling, research sources, validation, and remaining limitations.
+
 ## Running it
 
-```bash
-npm install
+Use Node.js 22.12 or newer (`.nvmrc` selects version 22).
 
-npm run dev        # web app with hot reload  → http://localhost:5173
-npm test           # 139 unit tests
+```bash
+npm ci
+
+npm run dev:web    # browser app with hot reload → http://127.0.0.1:5173
+npm run dev:desktop # desktop app with hot reload
+npm test           # domain, rendering, and profile interaction tests
+npm run test:desktop # desktop navigation policy tests
 npm run typecheck  # strict TypeScript, no emit
 
 npm run app        # build, then open as a desktop window
-npm run dist       # build the Windows installer + portable .exe → release/
+npm run package:web # build a ZIP ready for static web hosting → release/
+npm run dist:win   # build the Windows x64 installer + portable .exe → release/
 ```
 
 `npm run dist` produces two artifacts in `release/`:
@@ -28,21 +51,16 @@ npm run dist       # build the Windows installer + portable .exe → release/
 |---|---|
 | `Star-0.1.0-setup.exe` | NSIS installer, lets you choose the install directory |
 | `Star-0.1.0-portable.exe` | Single self-contained executable, no install |
+| `Star-0.1.0-web.zip` | Website files for static HTTPS hosting (from `npm run package:web`) |
 
-### If `npm run app` closes immediately
+The desktop launcher handles `ELECTRON_RUN_AS_NODE` inherited from Electron-based
+terminals automatically. `npm run dev` and `npm run dist` remain aliases for the
+original development and Windows-release workflows.
 
-VS Code and other Electron-based hosts export **`ELECTRON_RUN_AS_NODE=1`** to
-their child processes. That flag makes `electron.exe` behave as a plain Node
-binary, so `require('electron')` returns a path string instead of the API and
-the app exits before opening a window.
-
-It is an artifact of the terminal, not a bug in the app — double-clicking the
-built `.exe` from Explorer works fine. To run it from such a terminal:
-
-```powershell
-Remove-Item Env:ELECTRON_RUN_AS_NODE   # PowerShell
-npm run app
-```
+The same application works on the web and in the Windows package. Saved profiles
+and friends belong to the current browser or desktop application; they do not
+automatically sync between the two. See [distribution instructions](docs/DISTRIBUTION.md)
+for hosting, startup checks, desktop signing, and data-storage behavior.
 
 ## Layout
 

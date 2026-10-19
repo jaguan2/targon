@@ -1,118 +1,172 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { computeChart, type BirthInput, type NatalChart } from './domain/chart';
-import {
-  describeProfile,
-  greetingName,
-  possessiveName,
-  type Profile,
-} from './domain/profile';
+import { describeProfile, greetingName, possessiveName, type Profile } from './domain/profile';
+import { decodeSavedProfile, PROFILE_STORAGE_KEY, type SavedProfile } from './domain/savedProfile';
+import { decodeWorkspace, encodeWorkspace, type FriendProfile, type SavedWorkspace } from './domain/friends';
 import { Starfield } from './ui/Starfield';
 import { Onboarding } from './ui/Onboarding';
-import { ChartReadout } from './ui/ChartReadout';
+import { ProfileView } from './ui/ProfileView';
 import { Ranking } from './ui/Ranking';
 import { StarChart } from './ui/StarChart';
 import { useCompatibility } from './ui/useCompatibility';
+import { FriendsTab } from './ui/FriendsTab';
 
-interface Session {
-  profile: Profile;
+interface Session extends SavedProfile {
   chart: NatalChart;
 }
 
-/**
- * Split out so `useCompatibility` has a chart to work with — hooks cannot be
- * called conditionally, and there is no chart until onboarding completes.
- */
+function loadSession(): { session: Session | null; friends: FriendProfile[]; notice: string | null } {
+  if (typeof window === 'undefined') return { session: null, friends: [], notice: null };
+  try {
+    const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (!raw) return { session: null, friends: [], notice: null };
+    let saved: SavedWorkspace;
+    let notice: string | null = null;
+    try {
+      saved = decodeWorkspace(raw);
+    } catch (cause) {
+      const value: unknown = JSON.parse(raw);
+      if (typeof value !== 'object' || !value || !('version' in value) || value.version !== 2) throw cause;
+      // A damaged friend collection must not prevent access to a valid owner.
+      saved = { ...decodeSavedProfile(JSON.stringify({ ...value, version: 1 })), friends: [] };
+      notice = 'Saved friends could not be restored. Your own profile is available. The saved copy remains unchanged until you save new changes.';
+    }
+    return { session: { profile: saved.profile, birth: saved.birth, chart: computeChart(saved.birth, { houseSystem: 'placidus' }) }, friends: saved.friends, notice };
+  } catch {
+    return { session: null, friends: [], notice: 'The saved profile could not be loaded, or device storage is unavailable. You can still create a profile for this session.' };
+  }
+}
+
 function Results({ profile, chart }: Session) {
   const { mode, setMode, availableModes, ranked } = useCompatibility(chart);
-
-  const summary = describeProfile(
-    profile,
-    {
-      sun: chart.placements.get('sun')?.sign,
-      moon: chart.placements.get('moon')?.sign,
-      rising: chart.placements.get('ascendant')?.sign,
-    },
-    ranked[0]?.target.name,
-  );
-
+  const summary = describeProfile(profile, {
+    sun: chart.placements.get('sun')?.sign,
+    moon: chart.placements.get('moon')?.sign,
+    rising: chart.placements.get('ascendant')?.sign,
+  }, ranked[0]?.target.name);
   return (
     <>
-      <p className="profile-summary">{summary}</p>
+      {chart.tier === 'date' ? (
+        <p className="warning">These sign connections use estimated noon positions because your birth time is unknown. Check your Profile for assumptions and missing placements.</p>
+      ) : <p className="profile-summary">{summary}</p>}
+      <p className="panel__hint">Explore your chart against the twelve signs. Scores use a symbolic sign-based model; they are not percentages or comparisons with another person’s full chart.</p>
       <StarChart chart={chart} ranked={ranked} title={`${possessiveName(profile)} sky`} />
-      <ChartReadout chart={chart} />
-      <Ranking
-        chart={chart}
-        ranked={ranked}
-        mode={mode}
-        availableModes={availableModes}
-        onModeChange={setMode}
-      />
+      <Ranking chart={chart} ranked={ranked} mode={mode} availableModes={availableModes} onModeChange={setMode} />
     </>
   );
 }
 
 export function App() {
-  const [session, setSession] = useState<Session | null>(null);
+  const [initial] = useState(loadSession);
+  const [session, setSession] = useState<Session | null>(initial.session);
+  const [tab, setTab] = useState<'profile' | 'friends' | 'compatibility'>('profile');
+  const [friends, setFriends] = useState<FriendProfile[]>(initial.friends);
+  const [editing, setEditing] = useState(false);
+  const [remember, setRemember] = useState(Boolean(initial.session));
+  const [storageNotice, setStorageNotice] = useState<string | null>(initial.notice);
   const [error, setError] = useState<string | null>(null);
 
   const handleComplete = (profile: Profile, birth: BirthInput) => {
     try {
-      setSession({
-        profile,
-        chart: computeChart(birth, { houseSystem: 'placidus' }),
-      });
+      const chart = computeChart(birth, { houseSystem: 'placidus' });
+      const next = { profile, birth, chart };
+      setSession(next);
+      setEditing(false);
+      setTab('profile');
       setError(null);
+      setStorageNotice(null);
+      if (remember) {
+        try {
+          window.localStorage.setItem(PROFILE_STORAGE_KEY, encodeWorkspace({ ...next, friends }));
+        } catch {
+          setStorageNotice('Profile updated for this session, but the saved copy could not be updated.');
+        }
+      }
     } catch (cause) {
-      setSession(null);
-      setError(
-        cause instanceof Error ? cause.message : 'Could not compute that chart.',
-      );
+      setError(cause instanceof Error ? cause.message : 'Could not compute that chart.');
     }
   };
 
-  const name = session ? greetingName(session.profile) : null;
+  const handleRemember = (next: boolean) => {
+    if (!session) return;
+    try {
+      if (next) window.localStorage.setItem(PROFILE_STORAGE_KEY, encodeWorkspace({ ...session, friends }));
+      else window.localStorage.removeItem(PROFILE_STORAGE_KEY);
+      setRemember(next);
+      setStorageNotice(next ? 'Profile and friends saved on this device.' : 'Saved copy removed. Your profile and friends remain available for this session.');
+    } catch {
+      setStorageNotice('Device storage is unavailable. Your saved-profile preference could not be changed.');
+    }
+  };
 
+  const handleFriendsChange = (next: FriendProfile[]) => {
+    setFriends(next);
+    setStorageNotice(null);
+    if (remember && session) {
+      try {
+        window.localStorage.setItem(PROFILE_STORAGE_KEY, encodeWorkspace({ ...session, friends: next }));
+      } catch {
+        setStorageNotice('Friends updated for this session, but the saved copy could not be updated.');
+      }
+    }
+  };
+
+  const handleReset = () => {
+    let notice: string | null = null;
+    try {
+      window.localStorage.removeItem(PROFILE_STORAGE_KEY);
+    } catch {
+      if (remember) {
+        setStorageNotice('The saved copy could not be removed from this device. Try disabling storage restrictions and clearing again.');
+        return;
+      }
+      notice = 'Session cleared. Device storage could not be accessed, so any older saved copy could not be removed.';
+    }
+    setSession(null);
+    setFriends([]);
+    setRemember(false);
+    setEditing(false);
+    setError(null);
+    setStorageNotice(notice);
+  };
+
+  const name = session ? greetingName(session.profile) : null;
   return (
     <>
       <Starfield />
       <main className="shell">
         <header className="masthead">
           <h1>Star</h1>
-          <p>
-            {name
-              ? `Welcome, ${name}.`
-              : 'A birth chart, and the distances between signs.'}
-          </p>
+          <p>{name ? `Welcome, ${name}.` : 'A birth chart, and the distances between signs.'}</p>
         </header>
-
-        {session ? (
+        {session && !editing && (
+          <nav className="profile-nav" aria-label="Main navigation">
+            <button type="button" aria-pressed={tab === 'profile'} onClick={() => setTab('profile')}>Profile</button>
+            <button type="button" aria-pressed={tab === 'friends'} onClick={() => setTab('friends')}>Friends</button>
+            <button type="button" aria-pressed={tab === 'compatibility'} onClick={() => setTab('compatibility')}>Compatibility</button>
+          </nav>
+        )}
+        {session && !editing ? (
           <>
-            <Results {...session} />
-            <div className="restart">
-              <button
-                className="secondary"
-                type="button"
-                onClick={() => setSession(null)}
-              >
-                Start over
-              </button>
+            <div hidden={tab !== 'profile'}>
+              <ProfileView profile={session.profile} chart={session.chart} remember={remember} storageNotice={storageNotice} onRemember={handleRemember} onEdit={() => { setError(null); setEditing(true); }} onReset={handleReset} />
             </div>
+            <div hidden={tab !== 'friends'}>
+              <FriendsTab chart={session.chart} friends={friends} remember={remember} storageNotice={storageNotice} onChange={handleFriendsChange} />
+            </div>
+            <div hidden={tab !== 'compatibility'}><Results {...session} /></div>
           </>
         ) : (
-          <Onboarding onComplete={handleComplete} />
+          <>
+            {editing && <div className="edit-banner"><p>Editing your profile. Changes apply when you finish both steps.</p><button className="secondary" type="button" onClick={() => { setEditing(false); setError(null); }}>Cancel editing</button></div>}
+            <Onboarding onComplete={handleComplete} {...(session ? { initialProfile: session.profile, initialBirth: session.birth } : {})} editing={editing} />
+            {storageNotice && <p className="warning" role="status">{storageNotice}</p>}
+          </>
         )}
-
-        {error && (
-          <p className="warning" role="alert">
-            {error}
-          </p>
-        )}
-
+        {error && <p className="warning" role="alert">{error}</p>}
         <p className="footnote">
-          Positions are computed from a real ephemeris, accurate to about an
-          arcminute. The compatibility readings are traditional astrological
-          interpretation — a symbolic system worth exploring, not a predictive
-          one.
+          Planetary positions come from an astronomical ephemeris. Accuracy depends on your birth details.
+          Compatibility readings use traditional astrological symbolism for exploration and reflection.
         </p>
       </main>
     </>

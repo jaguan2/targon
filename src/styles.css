@@ -8,20 +8,16 @@
  */
 
 :root {
-  /* A twilight-blue palette rather than near-black: softer, lighter, and
-   * easier to sit with. Every accent is desaturated a step from its pure form
-   * so nothing shouts against the background. */
-  --void: #1b2b4a;
-  --nebula: #2a3d63;
-  /* The lightest band, at the very top of the page. Capped here rather than
-   * lighter because the masthead subtitle sits directly on it in --dim, and a
-   * lighter value drops that below the 4.5:1 body-text threshold. */
-  --horizon: #2f4368;
-  --starlight: #f4f7fc;
-  --gold: #f4dcae;
-  --harmony: #93dcd0;
-  --tension: #eaa8bc;
-  --dim: #a8b6d4;
+  /* Midnight surfaces, warm ivory type, and a restrained brass accent. */
+  --void: #0c1220;
+  --nebula: #151e2f;
+  /* Keep the lightest background subdued so secondary text stays readable. */
+  --horizon: #192539;
+  --starlight: #f1ebdd;
+  --gold: #d8bc80;
+  --harmony: #91cdbd;
+  --tension: #dca0af;
+  --dim: #abb4c5;
   --surface: rgba(255, 255, 255, 0.06);
   --border: rgba(244, 247, 252, 0.16);
   /* Recessed fields and cards — a touch darker than the panel they sit in. */
@@ -45,8 +41,8 @@ body {
   /* A dusk sky: lighter toward the top, settling darker at the foot of the
    * page, with two soft blooms rather than a hard vignette. */
   background:
-    radial-gradient(ellipse 90% 55% at 50% -5%, #42597f 0%, transparent 62%),
-    radial-gradient(ellipse 65% 45% at 88% 12%, #3d5273 0%, transparent 58%),
+    radial-gradient(ellipse 90% 55% at 50% -5%, #263349 0%, transparent 62%),
+    radial-gradient(ellipse 65% 45% at 88% 12%, #202e40 0%, transparent 58%),
     linear-gradient(180deg, var(--horizon) 0%, var(--nebula) 42%, var(--void) 100%);
   background-attachment: fixed;
 }
@@ -211,6 +207,13 @@ body {
 .field input:hover,
 .field select:hover {
   border-color: rgba(244, 247, 252, 0.3);
+}
+
+/* Native dropdown menus need an opaque surface; inheriting the page's light
+ * text over a browser-selected grey menu made city names hard to read. */
+.field select option {
+  background-color: var(--nebula);
+  color: var(--starlight);
 }
 
 .field input::placeholder {
@@ -576,13 +579,13 @@ table.placements td {
   border-radius: 2px;
 }
 
-.quality-harmonious span {
+.quality-harmonious .rank-row__bar > span {
   background: var(--harmony);
 }
-.quality-challenging span {
+.quality-challenging .rank-row__bar > span {
   background: var(--tension);
 }
-.quality-neutral span {
+.quality-neutral .rank-row__bar > span {
   background: var(--gold);
 }
 
@@ -779,4 +782,118 @@ table.placements td {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* Profile and birth details */
+.profile-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+.profile-nav button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.8rem 1.25rem;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  cursor: pointer;
+}
+.profile-nav button[aria-pressed='true'] {
+  color: var(--gold);
+  border-color: var(--border);
+  background: var(--surface);
+}
+.profile-heading, .edit-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+.profile-heading h2 { font-size: clamp(1.8rem, 5vw, 2.7rem); overflow-wrap: anywhere; }
+.profile-heading .secondary, .edit-banner .secondary { margin-top: 0; flex-shrink: 0; }
+.profile-heading .panel__hint { max-width: 34rem; margin: 0.75rem 0 0; line-height: 1.65; }
+.birth-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+.birth-summary dt { color: var(--dim); font-size: 0.8rem; margin-bottom: 0.5rem; }
+.birth-summary dd { margin: 0; overflow-wrap: anywhere; line-height: 1.6; }
+.remember-profile { display: flex; align-items: flex-start; gap: 0.75rem; line-height: 1.5; cursor: pointer; }
+.remember-profile input { margin-top: 0.25rem; width: 1.15rem; height: 1.15rem; flex-shrink: 0; accent-color: var(--gold); }
+.remember-profile small { display: block; color: var(--dim); margin-top: 0.4rem; }
+.profile-view .big-three { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
+.placement-status { display: block; color: var(--gold); font-family: var(--sans); font-size: 0.75rem; margin-top: 0.6rem; }
+.placement-meaning { color: var(--dim); font-size: 0.8rem; line-height: 1.6; margin: 0.75rem 0 0; }
+.profile-guide p { color: var(--dim); line-height: 1.75; }
+.field-help { color: var(--dim); font-size: 0.8rem; line-height: 1.6; }
+.birth-options { margin-top: 1.75rem; border-top: 1px solid var(--border); padding-top: 1.25rem; }
+.birth-options summary { cursor: pointer; color: var(--gold); line-height: 1.5; }
+.birth-options .field-grid { margin-top: 1.25rem; }
+.edit-banner { align-items: center; margin: 0 0 1.25rem; color: var(--dim); line-height: 1.5; }
+@media (max-width: 540px) {
+  .profile-heading, .edit-banner { flex-direction: column; gap: 1rem; }
+  .profile-heading .secondary, .edit-banner .secondary { width: 100%; }
+  .profile-nav button { flex: 1; padding-inline: 0.6rem; }
+}
+
+/* Friends: a local constellation of birth profiles. */
+.friends-header, .connection-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+.friends-header { margin: 2rem 0 1rem; }
+.friends-header h2 { font: 400 clamp(2rem, 5vw, 3rem) var(--serif); margin: 0; }
+.friends-header p:not(.step-count) { color: var(--dim); line-height: 1.65; max-width: 34rem; }
+.friends-header button.primary { width: auto; margin: 0.35rem 0 0; padding: 0.8rem 1.25rem; flex-shrink: 0; }
+.friends-empty { text-align: center; padding: 3rem 2rem; margin-top: 1.5rem; }
+.friends-empty__mark { display: block; color: var(--gold); font-size: 2rem; letter-spacing: 0.4rem; margin-bottom: 1.75rem; }
+.friends-empty h3 { font: 400 1.6rem var(--serif); margin: 0 0 1rem; }
+.friends-empty p { color: var(--dim); max-width: 30rem; margin: auto; line-height: 1.75; }
+.friend-grid { list-style: none; margin: 1.75rem 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem; }
+.friend-card { border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 1.25rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem 1rem; }
+.friend-card--selected { border-color: var(--gold); }
+.friend-avatar { color: var(--gold); font-size: 2rem; align-self: center; }
+.friend-card__identity h3 { font: 400 1.4rem var(--serif); margin: 0; overflow-wrap: anywhere; }
+.friend-card__identity p { color: var(--dim); font-size: 0.8rem; line-height: 1.6; margin: 0.5rem 0 0; }
+.friend-card__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.friend-card__actions .secondary { font-size: 0.8rem; padding: 0.65rem 0.85rem; margin: 0.5rem 0 0; }
+.friend-card__actions button[aria-pressed='true'] { color: var(--gold); border-color: var(--gold); }
+.friend-editor { margin-top: 1.5rem; }
+.friend-undo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 1rem; color: var(--gold); overflow-wrap: anywhere; }
+.friend-undo .secondary { margin: 0; }
+.friends-prompt { text-align: center; color: var(--dim); margin: 2rem 0; }
+.connection-heading h2 { font-size: clamp(1.6rem, 4vw, 2.3rem); overflow-wrap: anywhere; }
+.connection-heading .panel__hint { line-height: 1.6; margin-top: 0.75rem; }
+.connection-score { color: var(--gold); font-family: var(--serif); font-size: 2.6rem; text-align: right; margin: 0; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.connection-score small { color: var(--dim); display: block; font: 400 0.75rem var(--sans); margin-top: 0.25rem; }
+.interaspect-list { list-style: none; margin: 1.5rem 0; padding: 0; }
+.interaspect { border-top: 1px solid var(--border); padding: 1.25rem 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 1.5rem; }
+.interaspect__pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 0.75rem; font-size: 0.85rem; line-height: 1.6; overflow-wrap: anywhere; }
+.interaspect__pair small { display: block; color: var(--dim); margin-top: 0.4rem; }
+.interaspect__reading { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; line-height: 1.65; }
+.interaspect__reading span, .interaspect__reading small { color: var(--dim); }
+.interaspect--harmonious strong { color: var(--harmony); }
+.interaspect--challenging strong { color: var(--tension); }
+.interaspect--neutral strong { color: var(--gold); }
+.comparison-method { border-top: 1px solid var(--border); padding-top: 1.25rem; }
+.comparison-method summary, .friend-chart-details > summary, .friend-chart-caveats > summary { cursor: pointer; color: var(--gold); line-height: 1.65; }
+.comparison-method p { color: var(--dim); font-size: 0.85rem; line-height: 1.75; }
+.friend-chart-details > summary { margin-bottom: 1.5rem; }
+@media (max-width: 540px) {
+  .profile-nav { gap: 0.1rem; }
+  .profile-nav button { font-size: 0.85rem; padding-inline: 0.4rem; }
+  .friends-header { flex-direction: column; gap: 0.5rem; }
+  .friends-header button.primary { width: 100%; }
+  .connection-heading { flex-direction: column; gap: 0; }
+  .connection-score { text-align: left; margin-bottom: 1.5rem; }
+  .interaspect { grid-template-columns: 1fr; gap: 0.75rem; }
 }

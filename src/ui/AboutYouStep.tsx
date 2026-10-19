@@ -8,6 +8,7 @@ import {
 interface Props {
   initial: Profile;
   onNext: (profile: Profile) => void;
+  subject?: 'self' | 'friend';
 }
 
 /**
@@ -59,12 +60,17 @@ function ConstellationMark() {
  * Nothing here is required. Someone who just wants to see a chart can press
  * straight through, and the app falls back to second person.
  */
-export function AboutYouStep({ initial, onNext }: Props) {
+export function AboutYouStep({ initial, onNext, subject = 'self' }: Props) {
   const [name, setName] = useState(initial.name);
   const [pronouns, setPronouns] = useState<PronounKey>(initial.pronouns);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (subject === 'friend' && !name.trim()) {
+      setError('Enter a name so you can find this friend later.');
+      return;
+    }
     onNext({ name: name.trim(), pronouns });
   };
 
@@ -75,29 +81,32 @@ export function AboutYouStep({ initial, onNext }: Props) {
       <div className="intro">
         <ConstellationMark />
         <p className="step-count">Step 1 of 2</p>
-        <h2>Tell us about yourself</h2>
+        <h2>{subject === 'friend' ? 'Add someone to your constellation' : 'Tell us about yourself'}</h2>
         <p className="intro__lede">
-          Nothing here changes your chart — that depends only on when and where
-          you were born. It just lets us talk to you properly.
+          {subject === 'friend'
+            ? 'Start with a name or nickname, then add their birth details. Everything stays in this app on your device.'
+            : 'Nothing here changes your chart — that depends only on when and where you were born. It just lets us talk to you properly.'}
         </p>
       </div>
 
       <div className="field field--feature">
-        <label htmlFor="name">What should we call you?</label>
+        <label htmlFor="name">{subject === 'friend' ? 'Friend’s name or nickname' : 'What should we call you?'}</label>
         <input
           id="name"
           type="text"
-          autoComplete="given-name"
-          placeholder="Your name"
+          autoComplete={subject === 'friend' ? 'off' : 'given-name'}
+          placeholder={subject === 'friend' ? 'Their name' : 'Your name'}
           value={name}
           maxLength={40}
-          onChange={(event) => setName(event.target.value)}
+          required={subject === 'friend'}
+          autoFocus={subject === 'friend'}
+          onChange={(event) => { setName(event.target.value); setError(null); }}
         />
       </div>
 
       <fieldset className="fieldset fieldset--centred">
         <legend>
-          And your pronouns?
+          {subject === 'friend' ? 'Their pronouns?' : 'And your pronouns?'}
           <span className="optional-tag">optional</span>
         </legend>
         <div className="chip-row chip-row--centred">
@@ -115,12 +124,13 @@ export function AboutYouStep({ initial, onNext }: Props) {
         </div>
       </fieldset>
 
+      {error && <p className="warning" role="alert">{error}</p>}
       <button className="primary" type="submit">
-        {trimmed ? `Nice to meet you, ${trimmed}` : 'Continue'}
+        {subject === 'friend' ? 'Continue to birth details' : trimmed ? `Nice to meet you, ${trimmed}` : 'Continue'}
       </button>
 
       <p className="intro__skip">
-        Both are optional — carry on without them if you would rather.
+        {subject === 'friend' ? 'A nickname is fine. Pronouns are optional and do not affect the comparison.' : 'Both are optional — carry on without them if you would rather.'}
       </p>
     </form>
   );

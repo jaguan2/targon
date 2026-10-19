@@ -53,7 +53,9 @@ export type BodyName =
   | 'southNode'
   | 'chiron'
   | 'ascendant'
-  | 'midheaven';
+  | 'descendant'
+  | 'midheaven'
+  | 'imumCoeli';
 
 /** How significant a body is when weighting a compatibility score. */
 export type BodyClass =
@@ -83,9 +85,9 @@ export type AspectQuality = 'harmonious' | 'challenging' | 'neutral';
  * move so slowly that they carry no individual information — see `bodies.ts`.
  */
 export type PrecisionTier =
-  /** Date only. Sun sign is reliable; Moon may be wrong by up to ~half a sign. */
+  /** Unknown time. Positions are estimates at noon; signs near a cusp can change. */
   | 'date'
-  /** Date + time. All planets exact. Angles and houses still unavailable. */
+  /** Known time. Planetary positions; angles and houses still need a place. */
   | 'time'
   /** Date + time + place. Full chart: angles, houses, the lot. */
   | 'place';
