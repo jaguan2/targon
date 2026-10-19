@@ -183,6 +183,9 @@ describe('Friends tab', () => {
     submit();
     fill('date', '2001-01-01');
     submit();
+    act(() => container.querySelector<HTMLInputElement>('.unknown-time input')!.click());
+    submit();
+    submit();
     click('Friends');
     expect(container.querySelectorAll('.friend-card')).toHaveLength(0);
   });

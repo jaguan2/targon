@@ -2,6 +2,12 @@
 
 A birth chart, and the distances between signs.
 
+The midnight observatory refresh is implemented: a split introduction, guided
+birth intake, a profile overview, and compatibility highlights above the chart.
+First-time setup asks for name, birthday, birth time and birthplace in four
+steps, with an unknown-time option and preserved answers when going back.
+See [design notes](docs/DESIGN-REFRESH.md) and [verification](docs/TEST-REPORT.md).
+
 Enter your birth data and Star computes a real natal chart from an ephemeris,
 then shows how each of the twelve signs sits relative to it — as a zodiac wheel
 and as a force-directed constellation.

@@ -34,7 +34,11 @@ function createProfile(full = true) {
   fill('name', 'Mira');
   submit();
   fill('date', '2000-01-01');
-  if (full) { fill('time', '12:00'); fill('city', 'London, UK'); }
+  submit();
+  if (full) fill('time', '12:00');
+  else act(() => container.querySelector<HTMLInputElement>('.unknown-time input')!.click());
+  submit();
+  if (full) fill('city', 'London, UK');
   submit();
 }
 
@@ -53,17 +57,134 @@ afterEach(() => {
 });
 
 describe('profile lifecycle', () => {
+  it('asks one question per step, validates answers, and creates only at the end', () => {
+    mount();
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('Name');
+    expect(container.querySelector('#date')).toBeNull();
+    fill('name', 'Mira');
+    submit();
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('Birthday');
+    expect(container.querySelector('#time')).toBeNull();
+    submit();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('birth date');
+    fill('date', '2000-01-01');
+    submit();
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('Birth time');
+    expect(document.activeElement?.tagName).toBe('H2');
+    expect(container.querySelector('#city')).toBeNull();
+    submit();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('Enter your birth time');
+    fill('time', '00:00');
+    submit();
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('Birthplace');
+    expect(container.querySelector('.intake-review')?.textContent).toContain('00:00');
+    expect(container.querySelector('.profile-view')).toBeNull();
+    expect(window.localStorage.getItem(PROFILE_STORAGE_KEY)).toBeNull();
+    submit();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('timezone');
+    fill('city', 'London, UK');
+    document.documentElement.scrollTop = 600;
+    click('Create my profile');
+    expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Mira');
+    expect(document.activeElement).toBe(container.querySelector('.profile-heading h2'));
+    expect(document.documentElement.scrollTop).toBe(0);
+    expect(container.querySelector('.birth-summary')?.textContent).toContain('00:00');
+  });
+
+  it('returns to a completed step without losing later answers', () => {
+    mount();
+    submit();
+    fill('date', '2000-01-01');
+    submit();
+    fill('time', '12:00');
+    submit();
+    fill('city', 'London, UK');
+    const birthday = container.querySelector<HTMLButtonElement>('[aria-label="Back to Birthday"]')!;
+    act(() => birthday.click());
+    fill('date', '2000-04-01');
+    submit();
+    expect(container.querySelector<HTMLInputElement>('#time')?.value).toBe('12:00');
+    submit();
+    expect(container.querySelector<HTMLSelectElement>('#city')?.value).toBe('London, UK');
+    expect(container.querySelector('.intake-review')?.textContent).toContain('2000-04-01');
+    submit();
+    expect(container.querySelector('.big-three__value')?.textContent).toContain('Aries');
+  });
+
+  it('uses an explicit unknown time without retaining a previous clock value', () => {
+    mount();
+    submit();
+    fill('date', '2000-01-01');
+    submit();
+    fill('time', '12:00');
+    const unknown = container.querySelector<HTMLInputElement>('.unknown-time input')!;
+    act(() => unknown.click());
+    expect(container.querySelector<HTMLInputElement>('#time')?.disabled).toBe(true);
+    click('Back');
+    submit();
+    expect(container.querySelector<HTMLInputElement>('.unknown-time input')?.checked).toBe(true);
+    submit();
+    fill('city', 'London, UK');
+    submit();
+    expect(container.querySelector('.chart-status')?.textContent).toBe('Noon estimate');
+    expect(container.querySelector('.birth-summary')?.textContent).toContain('Unknown');
+    expect(container.querySelector('.big-three')?.textContent).toContain('needs birth time');
+    expect(container.querySelector('.birth-summary')?.textContent).toContain('Europe/London');
+  });
+
+  it('filters the offline cities without silently changing a selected birthplace', () => {
+    mount();
+    submit();
+    fill('date', '2000-01-01');
+    submit();
+    act(() => container.querySelector<HTMLInputElement>('.unknown-time input')!.click());
+    submit();
+    fill('city-search', 'london');
+    const select = container.querySelector<HTMLSelectElement>('#city')!;
+    expect([...select.options].some((option) => option.value === 'London, UK')).toBe(true);
+    expect([...select.options].some((option) => option.value === 'Tokyo, JP')).toBe(false);
+    fill('city', 'London, UK');
+    expect(container.querySelector('.place-zone')?.textContent).toContain('Europe/London');
+    fill('city-search', 'no such city');
+    expect(select.value).toBe('London, UK');
+    expect(container.querySelector('[role="status"]')?.textContent).toContain('No listed city');
+    submit();
+    expect(container.querySelector('.birth-summary')?.textContent).toContain('London, UK');
+  });
+
+  it('keeps shared compatibility highlights and chart in the selected lens', () => {
+    mount();
+    createProfile();
+    click('Explore compatibility');
+    expect(button('Compatibility').getAttribute('aria-pressed')).toBe('true');
+    const initial = container.querySelector('.connection-highlights')?.textContent;
+    click('Romantic');
+    expect(container.querySelector('.connection-highlights')?.textContent).not.toBe(initial);
+    const strongest = container.querySelector('.highlight-name h3')?.textContent;
+    expect(container.querySelector('.star-chart')?.getAttribute('aria-label')).toContain(strongest);
+    expect(container.querySelector('.rank-row__name')?.textContent).toBe(strongest);
+    click('Profile');
+    click('Meet your constellation');
+    expect(button('Friends').getAttribute('aria-pressed')).toBe('true');
+  });
+
   it('keeps birth details when returning to the identity step', () => {
     mount();
     submit();
     expect(container.querySelector<HTMLInputElement>('#date')?.value).toBe('');
     fill('date', '2000-01-01');
+    submit();
     fill('time', '12:00');
+    submit();
     fill('city', 'London, UK');
+    click('Back');
+    click('Back');
     click('Back');
     submit();
     expect(container.querySelector<HTMLInputElement>('#date')?.value).toBe('2000-01-01');
+    submit();
     expect(container.querySelector<HTMLInputElement>('#time')?.value).toBe('12:00');
+    submit();
     expect(container.querySelector<HTMLSelectElement>('#city')?.value).toBe('London, UK');
   });
 
@@ -86,7 +207,7 @@ describe('profile lifecycle', () => {
 
     click('Clear profile and start over');
     expect(window.localStorage.getItem(PROFILE_STORAGE_KEY)).toBeNull();
-    expect(container.textContent).toContain('Step 1 of 2');
+    expect(container.textContent).toContain('Step 1 of 4');
   });
 
   it('updates chart results after editing while cancel leaves the profile intact', () => {
@@ -123,7 +244,9 @@ describe('profile lifecycle', () => {
     mount();
     submit();
     fill('date', '2024-11-03');
+    submit();
     fill('time', '01:30');
+    submit();
     fill('city', 'New York, US');
     submit();
     expect(container.querySelector('[role="alert"]')?.textContent).toContain('occurred twice');
@@ -181,7 +304,7 @@ describe('profile lifecycle', () => {
     createProfile();
     vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => { throw new Error('Denied'); });
     click('Clear profile and start over');
-    expect(container.textContent).toContain('Step 1 of 2');
+    expect(container.textContent).toContain('Step 1 of 4');
     expect(container.textContent).toContain('Session cleared');
   });
 });

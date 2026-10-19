@@ -9,6 +9,7 @@ interface Props {
   initial: Profile;
   onNext: (profile: Profile) => void;
   subject?: 'self' | 'friend';
+  totalSteps?: number;
 }
 
 /**
@@ -60,7 +61,7 @@ function ConstellationMark() {
  * Nothing here is required. Someone who just wants to see a chart can press
  * straight through, and the app falls back to second person.
  */
-export function AboutYouStep({ initial, onNext, subject = 'self' }: Props) {
+export function AboutYouStep({ initial, onNext, subject = 'self', totalSteps = 2 }: Props) {
   const [name, setName] = useState(initial.name);
   const [pronouns, setPronouns] = useState<PronounKey>(initial.pronouns);
   const [error, setError] = useState<string | null>(null);
@@ -77,15 +78,15 @@ export function AboutYouStep({ initial, onNext, subject = 'self' }: Props) {
   const trimmed = name.trim();
 
   return (
-    <form className="panel panel--intro" onSubmit={handleSubmit}>
+    <form className="panel panel--intro" data-intake-stage="name" onSubmit={handleSubmit}>
       <div className="intro">
         <ConstellationMark />
-        <p className="step-count">Step 1 of 2</p>
-        <h2>{subject === 'friend' ? 'Add someone to your constellation' : 'Tell us about yourself'}</h2>
+        <p className="step-count">Step 1 of {totalSteps}</p>
+        <h2>{subject === 'friend' ? 'Add someone to your constellation' : 'Let’s start with you.'}</h2>
         <p className="intro__lede">
           {subject === 'friend'
             ? 'Start with a name or nickname, then add their birth details. Everything stays in this app on your device.'
-            : 'Nothing here changes your chart — that depends only on when and where you were born. It just lets us talk to you properly.'}
+            : 'A name makes this feel like your space. Your chart comes from when and where you were born.'}
         </p>
       </div>
 
@@ -104,6 +105,8 @@ export function AboutYouStep({ initial, onNext, subject = 'self' }: Props) {
         />
       </div>
 
+      <details className="pronoun-options" open={pronouns !== 'unspecified' || undefined}>
+      <summary>{subject === 'friend' ? 'Add their pronouns' : 'Add your pronouns'} <span className="optional-tag">optional</span></summary>
       <fieldset className="fieldset fieldset--centred">
         <legend>
           {subject === 'friend' ? 'Their pronouns?' : 'And your pronouns?'}
@@ -123,14 +126,15 @@ export function AboutYouStep({ initial, onNext, subject = 'self' }: Props) {
           ))}
         </div>
       </fieldset>
+      </details>
 
       {error && <p className="warning" role="alert">{error}</p>}
       <button className="primary" type="submit">
-        {subject === 'friend' ? 'Continue to birth details' : trimmed ? `Nice to meet you, ${trimmed}` : 'Continue'}
+        {subject === 'friend' ? 'Continue to birth details' : 'Continue'}
       </button>
 
       <p className="intro__skip">
-        {subject === 'friend' ? 'A nickname is fine. Pronouns are optional and do not affect the comparison.' : 'Both are optional — carry on without them if you would rather.'}
+        {subject === 'friend' ? 'A nickname is fine. Pronouns are optional and do not affect the comparison.' : trimmed ? `Your birthday is next, ${trimmed}.` : 'You can continue without a name.'}
       </p>
     </form>
   );

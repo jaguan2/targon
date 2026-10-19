@@ -22,6 +22,12 @@ describe('birth details intake', () => {
     expect(birthFromDraft(createBirthDraft(input))).toEqual(input);
   });
 
+  it('omits clock data when the user explicitly selects unknown time', () => {
+    const birth = birthFromDraft({ ...createBirthDraft(), date: '2000-01-01', time: '01:30', timeUnknown: true, timeOccurrence: 'later' });
+    expect(birth.hour).toBeUndefined();
+    expect(birth.timeOccurrence).toBeUndefined();
+  });
+
   it('rejects partial coordinates instead of silently ignoring them', () => {
     expect(() => birthFromDraft({ ...createBirthDraft(), date: '2000-01-01', city: MANUAL_PLACE, latitude: '40' })).toThrow(/both coordinates/);
   });

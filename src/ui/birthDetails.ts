@@ -6,6 +6,7 @@ export const MANUAL_PLACE = '__manual__';
 export interface BirthDraft {
   date: string;
   time: string;
+  timeUnknown: boolean;
   city: string;
   latitude: string;
   longitude: string;
@@ -18,6 +19,7 @@ export function createBirthDraft(input?: BirthInput): BirthDraft {
   return {
     date: input ? `${String(input.year).padStart(4, '0')}-${String(input.month).padStart(2, '0')}-${String(input.day).padStart(2, '0')}` : '',
     time: input?.hour !== undefined ? `${String(input.hour).padStart(2, '0')}:${String(input.minute ?? 0).padStart(2, '0')}` : '',
+    timeUnknown: input !== undefined && input.hour === undefined,
     city: city?.name ?? (input?.latitude !== undefined ? MANUAL_PLACE : ''),
     latitude: input?.latitude !== undefined ? String(input.latitude) : '',
     longitude: input?.longitude !== undefined ? String(input.longitude) : '',
@@ -30,7 +32,7 @@ export function birthFromDraft(draft: BirthDraft): BirthInput {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) throw new Error('Please enter a birth date.');
   const [year, month, day] = draft.date.split('-').map(Number) as [number, number, number];
   const input: BirthInput = { year, month, day };
-  if (draft.time) {
+  if (draft.time && !draft.timeUnknown) {
     if (!/^\d{2}:\d{2}$/.test(draft.time)) throw new Error('Please enter a valid birth time.');
     const [hour, minute] = draft.time.split(':').map(Number) as [number, number];
     input.hour = hour;
@@ -52,7 +54,7 @@ export function birthFromDraft(draft: BirthDraft): BirthInput {
   if (input.hour !== undefined && input.latitude === undefined && !input.timeZone) {
     throw new Error('Choose a birth place or enter its timezone so we can interpret the local birth time.');
   }
-  if (draft.timeOccurrence) input.timeOccurrence = draft.timeOccurrence;
+  if (draft.timeOccurrence && input.hour !== undefined) input.timeOccurrence = draft.timeOccurrence;
   resolveBirthMoment(input);
   return input;
 }

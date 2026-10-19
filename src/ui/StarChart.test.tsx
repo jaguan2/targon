@@ -104,7 +104,7 @@ describe('App rendering', () => {
   const markup = renderToStaticMarkup(<App />);
 
   it('opens on the soft first step, not the birth form', () => {
-    expect(markup).toContain('Step 1 of 2');
+    expect(markup).toContain('Step 1 of 4');
     expect(markup).toContain('What should we call you?');
     // Birth fields belong to step two and must not be on screen yet.
     expect(markup).not.toContain('Birth date');

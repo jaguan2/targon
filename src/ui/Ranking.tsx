@@ -1,17 +1,12 @@
 import type { NatalChart } from '../domain/chart';
 import {
-  MODE_LABELS,
   scoreFraction,
   type ChartSignCompatibility,
-  type CompatibilityMode,
 } from '../domain/compatibility';
 
 interface Props {
   chart: NatalChart;
   ranked: readonly ChartSignCompatibility[];
-  mode: CompatibilityMode;
-  availableModes: readonly CompatibilityMode[];
-  onModeChange: (mode: CompatibilityMode) => void;
 }
 
 /** Floored at 2% so the weakest pairing still shows a sliver of bar. */
@@ -22,30 +17,14 @@ function barWidth(score: number): string {
 export function Ranking({
   chart,
   ranked,
-  mode,
-  availableModes,
-  onModeChange,
 }: Props) {
   return (
-    <section className="panel">
-      <h2>Compatibility</h2>
+    <section className="panel ranking-panel">
+      <h2>All twelve signs</h2>
       <p className="panel__hint">
         How each sign sits relative to your chart, weighted across your
         placements.
       </p>
-
-      <div className="mode-switch" role="group" aria-label="Compatibility lens">
-        {availableModes.map((m) => (
-          <button
-            key={m}
-            type="button"
-            aria-pressed={mode === m}
-            onClick={() => onModeChange(m)}
-          >
-            {MODE_LABELS[m]}
-          </button>
-        ))}
-      </div>
 
       <ol className="ranking">
         {ranked.map((entry) => {

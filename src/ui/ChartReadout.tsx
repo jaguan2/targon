@@ -23,7 +23,8 @@ export function ChartReadout({ chart, title = 'Your signs & placements' }: Props
   const rows = [...chart.placements.values()];
 
   return (
-    <section className="panel">
+    <section className="panel chart-readout">
+      <p className="step-count">The signature of your sky</p>
       <h2>{title}</h2>
       <p className="panel__hint">
         {chart.tier === 'date' ? 'Reference moment (assumed noon): ' : 'Birth moment: '}
@@ -66,6 +67,8 @@ export function ChartReadout({ chart, title = 'Your signs & placements' }: Props
         })}
       </div>
 
+      <details className="placement-details">
+      <summary>Explore all planetary placements <span>Degrees, houses & retrogrades</span></summary>
       <div className="table-scroll">
         <table className="placements">
           <thead>
@@ -100,6 +103,7 @@ export function ChartReadout({ chart, title = 'Your signs & placements' }: Props
           </tbody>
         </table>
       </div>
+      </details>
     </section>
   );
 }

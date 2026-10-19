@@ -2,6 +2,39 @@
 
 Reviewed October 18, 2026. Product naming remains Star until the Targon rename.
 
+## October 19 implementation update
+
+First-time profile setup now uses four separate steps: Name, Birthday, Birth
+time, and Birthplace. The progress indicator marks the current step and lets
+users return to completed steps. Answers stay in the onboarding draft when
+moving back and forward. The birthplace step summarizes the previous answers;
+only its final Create my profile action calculates the completed profile.
+
+Birthday is required. The birth-time step accepts a local clock time or an
+explicit unknown-time choice; timezone resolution waits until birthplace is
+entered. A known time with no place still requires an explicit timezone. Existing
+profile edits and friend entry keep the compact two-step form. This is local
+profile setup; no account registration or server submission has been added.
+
+The profile calculations and persistence audited below are implemented, and the
+full [design refresh](DESIGN-REFRESH.md) now wraps those flows. The intake adds an
+explicit unknown-time checkbox: selecting it clears and disables the clock
+field, discards any repeated-time occurrence, and keeps time-dependent angles
+unavailable. Changing back to a known time allows a new clock value. Back
+navigation preserves the choice; restoring a date-only profile preselects it.
+
+The existing 32-city offline list can now be filtered without changing a saved
+selection. Matching is case- and accent-insensitive. No-match feedback points to
+manual coordinates, and selecting a listed place previews its IANA timezone.
+This remains a limited offline list, rather than a worldwide geocoder.
+
+Profile signs and birth details remain derived from the same computed chart.
+Technical placements expand on demand; saving remains opt-in. Existing saved
+profiles and friends require no storage migration for this refresh. New flow
+tests cover the unknown-time choice, city filtering, timezone preview, and
+shared compatibility views. Current verification supersedes the original
+environment notes at the end of this audit; see [the test report](TEST-REPORT.md).
+
 Subsequent update: the [Friends tab](FRIENDS.md) now provides local friend
 profiles and selected two-chart comparisons. References below to that feature
 as future work describe the earlier profile audit.

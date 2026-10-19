@@ -90,7 +90,7 @@ function createWindow() {
           bundledPage: location.protocol === 'file:',
           title: document.title,
           appMounted: !!document.querySelector('.shell .masthead'),
-          onboarding: document.body.textContent.includes('Step 1 of 2'),
+          onboarding: !!document.querySelector('[data-intake-stage="name"]'),
           stylesLoaded: getComputedStyle(document.documentElement).getPropertyValue('--void').trim() === '#0c1220'
         })`);
         if (!checks.bundledPage || !checks.appMounted || !checks.onboarding || !checks.stylesLoaded) {

@@ -25,7 +25,7 @@ for (const mount of ['/', '/star/']) {
     const html = await response.text();
     assert(html.includes('<div id="root"></div>'));
     assert(!html.includes('/src/main.tsx'));
-    const refs = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map((match) => match[1]);
+    const refs = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|svg))"/g)].map((match) => match[1]);
     assert(refs.some((ref) => ref.endsWith('.js')), 'Missing JavaScript entry point.');
     assert(refs.some((ref) => ref.endsWith('.css')), 'Missing stylesheet.');
     for (const ref of refs) {

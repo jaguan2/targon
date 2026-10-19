@@ -106,6 +106,12 @@ Publishing requires choosing the hosting destination and uploading the build.
 
 ## Verification on October 18, 2026
 
+The artifacts were subsequently rebuilt with the October 19 design and profile
+refresh and four-step onboarding. All 225 application tests and five desktop navigation checks passed;
+web asset checks and both executable startup checks also passed. See the current
+[test report](TEST-REPORT.md) for the browser review and coverage limits. The
+following paragraph records the earlier verification.
+
 Using Node 22.23.3, all 219 application tests and five desktop navigation tests
 passed. The current Windows x64 installer and portable executable were built
 successfully. Hidden startup checks passed for both the unpacked app and the

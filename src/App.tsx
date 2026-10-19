@@ -10,6 +10,7 @@ import { Ranking } from './ui/Ranking';
 import { StarChart } from './ui/StarChart';
 import { useCompatibility } from './ui/useCompatibility';
 import { FriendsTab } from './ui/FriendsTab';
+import { MODE_LABELS } from './domain/compatibility';
 
 interface Session extends SavedProfile {
   chart: NatalChart;
@@ -46,12 +47,28 @@ function Results({ profile, chart }: Session) {
   }, ranked[0]?.target.name);
   return (
     <>
+      <header className="results-heading">
+        <p className="step-count">The space between signs</p>
+        <h2>Follow the connections.</h2>
+        <p>Different connections bring out different sides of you. Choose a lens to explore yours.</p>
+        <div className="mode-switch" role="group" aria-label="Compatibility lens">
+          {availableModes.map((m) => <button type="button" key={m} aria-pressed={mode === m} onClick={() => setMode(m)}>{MODE_LABELS[m]}</button>)}
+        </div>
+      </header>
       {chart.tier === 'date' ? (
         <p className="warning">These sign connections use estimated noon positions because your birth time is unknown. Check your Profile for assumptions and missing placements.</p>
       ) : <p className="profile-summary">{summary}</p>}
       <p className="panel__hint">Explore your chart against the twelve signs. Scores use a symbolic sign-based model; they are not percentages or comparisons with another person’s full chart.</p>
+      <ol className="connection-highlights" aria-label="Strongest sign connections">
+        {ranked.slice(0, 3).map((entry, index) => <li key={entry.target.name}>
+          <div className="highlight-heading"><span className="step-count">0{index + 1} / {index === 0 ? 'Strongest connection' : 'In your orbit'}</span><span className="highlight-glyph" aria-hidden="true">{entry.target.glyph}</span></div>
+          <div className="highlight-name"><h3>{entry.target.label}</h3><span>{entry.score}<small>index</small></span></div><p>{entry.summary}</p>
+        </li>)}
+      </ol>
+      <div className="results-layout">
       <StarChart chart={chart} ranked={ranked} title={`${possessiveName(profile)} sky`} />
-      <Ranking chart={chart} ranked={ranked} mode={mode} availableModes={availableModes} onModeChange={setMode} />
+      <Ranking chart={chart} ranked={ranked} />
+      </div>
     </>
   );
 }
@@ -134,11 +151,9 @@ export function App() {
   return (
     <>
       <Starfield />
-      <main className="shell">
+      <main className={`shell${!session || editing ? ' shell--intake' : ''}`}>
         <header className="masthead">
-          <h1>Star</h1>
-          <p>{name ? `Welcome, ${name}.` : 'A birth chart, and the distances between signs.'}</p>
-        </header>
+          <div className="brand"><span className="brand__mark" aria-hidden="true">✳</span><div><h1>Star<span className="brand__caption">A personal observatory</span></h1></div></div>
         {session && !editing && (
           <nav className="profile-nav" aria-label="Main navigation">
             <button type="button" aria-pressed={tab === 'profile'} onClick={() => setTab('profile')}>Profile</button>
@@ -146,10 +161,12 @@ export function App() {
             <button type="button" aria-pressed={tab === 'compatibility'} onClick={() => setTab('compatibility')}>Compatibility</button>
           </nav>
         )}
+          <p className="masthead__note">{name ? `Your orbit, ${name}` : 'Look within. Connect beyond.'}</p>
+        </header>
         {session && !editing ? (
           <>
             <div hidden={tab !== 'profile'}>
-              <ProfileView profile={session.profile} chart={session.chart} remember={remember} storageNotice={storageNotice} onRemember={handleRemember} onEdit={() => { setError(null); setEditing(true); }} onReset={handleReset} />
+              <ProfileView profile={session.profile} chart={session.chart} remember={remember} storageNotice={storageNotice} onRemember={handleRemember} onEdit={() => { setError(null); setEditing(true); }} onReset={handleReset} onExplore={() => setTab('compatibility')} onFriends={() => setTab('friends')} />
             </div>
             <div hidden={tab !== 'friends'}>
               <FriendsTab chart={session.chart} friends={friends} remember={remember} storageNotice={storageNotice} onChange={handleFriendsChange} />

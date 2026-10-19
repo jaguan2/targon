@@ -2,6 +2,41 @@
 
 Reviewed October 18, 2026. The app remains named Star until the later rename.
 
+## Implementation update — October 19, 2026
+
+The midnight observatory refresh is now implemented. The research and original
+baseline below are retained as context, rather than a description of today's UI.
+
+First-time onboarding has since been refined into a four-step wizard: Name,
+Birthday, Birth time and Birthplace. Each screen asks one main question, with a
+numbered progress indicator, Back navigation, completed-step links, and a final
+answer summary. Friend entry and profile editing retain their compact flow.
+
+- A compact brand header replaces the large centered masthead. Ink surfaces,
+  ivory serif headings, brass actions, restrained stars and fine borders carry
+  the identity without repeated glows or frosted panels.
+- Introduction and birth intake use a split desktop composition with original
+  SVG orbital art. The illustration is explicitly decorative, independent of
+  calculated charts. Narrow layouts remove it and put the form in one column.
+- The first step explains the product, keeps name optional, puts pronouns in a
+  disclosure, and uses a stable Continue action. A step indicator shows progress.
+- Birth intake adds an explicit unknown-time choice, filtering of the 32-city
+  offline list, a birthplace timezone preview, and contextual chart availability.
+  Coordinates and timezone/clock-change controls remain available.
+- The profile leads with the six principal signs/angles. Birth details and
+  saving controls sit beside the chart on desktop; full planetary degrees,
+  houses and retrogrades expand on demand. Related actions open Compatibility
+  and Friends directly.
+- Compatibility lenses sit above both charts and rankings. Three strongest sign
+  connections appear first, followed by the interactive chart and all twelve
+  rankings. Selected modes update all of these from the same calculation.
+- Zodiac symbols request text presentation, and the site now has a matching SVG
+  favicon. Assets and system-font fallbacks work offline; no remote fonts or
+  images are required.
+
+The original name, storage keys, and desktop application identity remain Star.
+Verification details are in [the test report](TEST-REPORT.md).
+
 ## Baseline before the profile implementation
 
 This is a working local React/TypeScript application with an Electron desktop
