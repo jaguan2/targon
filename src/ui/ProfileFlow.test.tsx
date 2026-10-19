@@ -57,6 +57,20 @@ afterEach(() => {
 });
 
 describe('profile lifecycle', () => {
+  it('restores original Star profiles and friends under the Targon name', () => {
+    window.localStorage.setItem('star.profile.v1', JSON.stringify({
+      version: 2,
+      profile: { name: 'Legacy Mira', pronouns: 'they' },
+      birth: { year: 2000, month: 1, day: 1 },
+      friends: [{ id: 'legacy-alex', profile: { name: 'Legacy Alex', pronouns: 'unspecified' }, birth: { year: 2000, month: 4, day: 1 } }],
+    }));
+    mount();
+    expect(container.querySelector('h1')?.textContent).toContain('Targon');
+    expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Legacy Mira');
+    click('Friends');
+    expect(container.querySelector('.friend-card h3')?.textContent).toBe('Legacy Alex');
+  });
+
   it('asks one question per step, validates answers, and creates only at the end', () => {
     mount();
     expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('Name');

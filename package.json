@@ -1,5 +1,5 @@
 {
-  "name": "star",
+  "name": "targon",
   "private": true,
   "version": "0.1.0",
   "description": "A birth chart, and the distances between signs.",
@@ -19,7 +19,7 @@
     "preview": "vite preview",
     "preview:web": "vite preview --host 127.0.0.1",
     "test": "vitest run",
-    "test:desktop": "node --test scripts/navigation.test.cjs",
+    "test:desktop": "node --test scripts/navigation.test.cjs scripts/identity.test.cjs",
     "smoke:desktop": "node scripts/smoke-desktop.mjs",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -30,7 +30,7 @@
   },
   "build": {
     "appId": "com.jason.star",
-    "productName": "Star",
+    "productName": "Targon",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -46,12 +46,12 @@
       ]
     },
     "portable": {
-      "artifactName": "Star-${version}-portable.exe"
+      "artifactName": "Targon-${version}-portable.exe"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "Star-${version}-setup.exe"
+      "artifactName": "Targon-${version}-setup.exe"
     }
   },
   "dependencies": {

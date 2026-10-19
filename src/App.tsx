@@ -153,7 +153,7 @@ export function App() {
       <Starfield />
       <main className={`shell${!session || editing ? ' shell--intake' : ''}`}>
         <header className="masthead">
-          <div className="brand"><span className="brand__mark" aria-hidden="true">✳</span><div><h1>Star<span className="brand__caption">A personal observatory</span></h1></div></div>
+          <div className="brand"><span className="brand__mark" aria-hidden="true">✳</span><div><h1>Targon<span className="brand__caption">A personal observatory</span></h1></div></div>
         {session && !editing && (
           <nav className="profile-nav" aria-label="Main navigation">
             <button type="button" aria-pressed={tab === 'profile'} onClick={() => setTab('profile')}>Profile</button>

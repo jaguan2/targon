@@ -19,8 +19,8 @@ test('navigation checks origin rather than URL prefix', () => {
   assert.equal(isAppNavigation('http://localhost:5174.evil.test', options), false);
 });
 test('production navigation permits the entry page and fragments only', () => {
-  const options = { indexUrl: 'file:///C:/star/dist/index.html' };
-  assert.equal(isAppNavigation('file:///C:/star/dist/index.html#friends', options), true);
+  const options = { indexUrl: 'file:///C:/targon/dist/index.html' };
+  assert.equal(isAppNavigation('file:///C:/targon/dist/index.html#friends', options), true);
   assert.equal(isAppNavigation('file:///C:/Users/private.txt', options), false);
   assert.equal(isAppNavigation('https://example.com', options), false);
 });

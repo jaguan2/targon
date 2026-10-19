@@ -16,15 +16,13 @@ const fs = require('node:fs');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
 const { developmentUrl, isAppNavigation, externalUrl } = require('./navigation.cjs');
+const { userDataPath } = require('./identity.cjs');
 
 // Isolated, hidden startup check used by the release smoke-test command.
 const smokeReportPath = app.commandLine.getSwitchValue('smoke-test-report');
-if (smokeReportPath) {
-  if (!path.isAbsolute(smokeReportPath)) throw new Error('Smoke report path must be absolute.');
-  const smokeDataPath = path.join(path.dirname(smokeReportPath), 'user-data');
-  fs.mkdirSync(smokeDataPath, { recursive: true });
-  app.setPath('userData', smokeDataPath);
-}
+const dataPath = userDataPath(app.getPath('appData'), smokeReportPath);
+fs.mkdirSync(dataPath, { recursive: true });
+app.setPath('userData', dataPath);
 let smokeFinished = false;
 function finishSmoke(error, checks) {
   if (!smokeReportPath || smokeFinished) return;
@@ -38,7 +36,7 @@ if (smokeReportPath) setTimeout(() => finishSmoke('Desktop startup timed out.'),
  * A packaged Windows app has no console, so an error during startup would
  * otherwise vanish and look like "it just closes". Record it somewhere findable.
  */
-const logPath = path.join(os.tmpdir(), 'star-main.log');
+const logPath = path.join(os.tmpdir(), 'targon-main.log');
 
 function log(message) {
   try {

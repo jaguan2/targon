@@ -1,6 +1,7 @@
 # Star → Targon: design research and refresh brief
 
-Reviewed October 18, 2026. The app remains named Star until the later rename.
+Reviewed October 18, 2026. The product was subsequently renamed Targon on
+October 19; references to Star below describe the earlier design stages.
 
 ## Implementation update — October 19, 2026
 
@@ -34,7 +35,8 @@ answer summary. Friend entry and profile editing retain their compact flow.
   favicon. Assets and system-font fallbacks work offline; no remote fonts or
   images are required.
 
-The original name, storage keys, and desktop application identity remain Star.
+The app and release names are now Targon; storage identifiers and the installer
+identity remain compatible with Star. See [rename notes](TARGON-RENAME.md).
 Verification details are in [the test report](TEST-REPORT.md).
 
 ## Baseline before the profile implementation

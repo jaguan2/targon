@@ -6,6 +6,7 @@ export interface SavedProfile {
   birth: BirthInput;
 }
 
+// Retained through the Targon rename so existing profiles and friends survive.
 export const PROFILE_STORAGE_KEY = 'star.profile.v1';
 
 export function encodeSavedProfile(value: SavedProfile): string {

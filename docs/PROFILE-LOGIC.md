@@ -1,6 +1,7 @@
 # Profile setup and chart-logic audit
 
-Reviewed October 18, 2026. Product naming remains Star until the Targon rename.
+Reviewed October 18, 2026. The product was renamed Targon on October 19 while
+preserving existing profile and friend storage. See [rename notes](TARGON-RENAME.md).
 
 ## October 19 implementation update
 

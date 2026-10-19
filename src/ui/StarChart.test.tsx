@@ -119,7 +119,7 @@ describe('App rendering', () => {
   });
 
   it('renders the shell and starfield', () => {
-    expect(markup).toContain('Star');
+    expect(markup).toContain('Targon');
     // The starfield draws its layers as box-shadows, not elements.
     expect(markup).toContain('starfield');
     expect(markup).toContain('box-shadow');

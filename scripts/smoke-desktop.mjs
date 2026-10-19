@@ -3,9 +3,9 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, relative, isAbsolute } from 'node:path';
 
-const executable = resolve(process.argv[2] ?? 'release/win-unpacked/Star.exe');
+const executable = resolve(process.argv[2] ?? 'release/win-unpacked/Targon.exe');
 const tempRoot = resolve(tmpdir());
-const workspace = await mkdtemp(join(tempRoot, 'star-desktop-smoke-'));
+const workspace = await mkdtemp(join(tempRoot, 'targon-desktop-smoke-'));
 const reportPath = join(workspace, 'report.json');
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
@@ -24,7 +24,7 @@ try {
 } finally {
   // Resolve and check the owned temporary directory before recursive cleanup.
   const childPath = relative(tempRoot, resolve(workspace));
-  if (!childPath || childPath.startsWith('..') || isAbsolute(childPath) || !childPath.startsWith('star-desktop-smoke-')) {
+  if (!childPath || childPath.startsWith('..') || isAbsolute(childPath) || !childPath.startsWith('targon-desktop-smoke-')) {
     throw new Error('Refusing to clean a path outside the smoke-test workspace.');
   }
   await rm(workspace, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 });

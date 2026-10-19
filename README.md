@@ -1,4 +1,4 @@
-# Star
+# Targon
 
 A birth chart, and the distances between signs.
 
@@ -8,7 +8,7 @@ First-time setup asks for name, birthday, birth time and birthplace in four
 steps, with an unknown-time option and preserved answers when going back.
 See [design notes](docs/DESIGN-REFRESH.md) and [verification](docs/TEST-REPORT.md).
 
-Enter your birth data and Star computes a real natal chart from an ephemeris,
+Enter your birth data and Targon computes a real natal chart from an ephemeris,
 then shows how each of the twelve signs sits relative to it — as a zodiac wheel
 and as a force-directed constellation.
 
@@ -55,9 +55,9 @@ npm run dist:win   # build the Windows x64 installer + portable .exe → release
 
 | File | What it is |
 |---|---|
-| `Star-0.1.0-setup.exe` | NSIS installer, lets you choose the install directory |
-| `Star-0.1.0-portable.exe` | Single self-contained executable, no install |
-| `Star-0.1.0-web.zip` | Website files for static HTTPS hosting (from `npm run package:web`) |
+| `Targon-0.1.0-setup.exe` | NSIS installer, lets you choose the install directory |
+| `Targon-0.1.0-portable.exe` | Single self-contained executable, no install |
+| `Targon-0.1.0-web.zip` | Website files for static HTTPS hosting (from `npm run package:web`) |
 
 The desktop launcher handles `ELECTRON_RUN_AS_NODE` inherited from Electron-based
 terminals automatically. `npm run dev` and `npm run dist` remain aliases for the

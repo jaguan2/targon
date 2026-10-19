@@ -1,11 +1,14 @@
 # Web and Windows distribution
 
-Star uses one React/TypeScript application for both delivery formats. Vite builds
+Targon uses one React/TypeScript application for both delivery formats. Vite builds
 the static web assets in `dist/`; Electron packages those same assets into a
 Windows application. Profile, Friends, chart calculations and comparisons run
 in both versions. No backend is needed for the current local-data features.
 
-Product names and installer IDs remain Star until the planned Targon rename.
+The app, package and release files are named Targon. The internal installer ID
+`com.jason.star`, desktop data directory `Star`, and browser storage key
+`star.profile.v1` deliberately remain stable so existing installations, saved
+profiles and friends continue to work. See [rename notes](TARGON-RENAME.md).
 
 ## Development
 
@@ -29,7 +32,7 @@ Vite server.
 ## Web release
 
 Run `npm run package:web` to create the web build and
-`release/Star-0.1.0-web.zip` (the filename follows the package version).
+`release/Targon-0.1.0-web.zip` (the filename follows the package version).
 
 The ZIP contains `index.html` and its assets at the root. Extract it and upload
 those contents to static HTTPS hosting. Alternatively, build directly on the
@@ -49,7 +52,8 @@ public production host. Double-clicking `dist/index.html` is not the supported
 way to run the browser version.
 
 `node scripts/smoke-web.mjs` checks the web ZIP over local HTTP at both `/` and
-`/star/`, including the HTML's JavaScript and stylesheet references. Application
+`/targon/` and the previous `/star/` path, including JavaScript, stylesheet and
+favicon references. Application
 interaction tests are separate from those artifact checks.
 
 ## Windows release
@@ -59,9 +63,9 @@ It builds the web UI and packages Windows x64 artifacts without publishing:
 
 | Artifact | Purpose |
 | --- | --- |
-| `release/Star-0.1.0-setup.exe` | NSIS installer with a selectable install directory |
-| `release/Star-0.1.0-portable.exe` | Self-contained launcher requiring no installation |
-| `release/win-unpacked/Star.exe` | Unpacked application for testing; distribute the whole folder if using this form |
+| `release/Targon-0.1.0-setup.exe` | NSIS installer with a selectable install directory |
+| `release/Targon-0.1.0-portable.exe` | Self-contained launcher requiring no installation |
+| `release/win-unpacked/Targon.exe` | Unpacked application for testing; distribute the whole folder if using this form |
 
 The installer and portable launcher include Electron and the web UI. End users
 do not need Node.js, npm, a local web server, or a browser installation. The
@@ -69,13 +73,13 @@ current app's calculations and locally saved profiles work without a network
 connection in the desktop version.
 
 `npm run dist:dir` builds only the unpacked test application. Do not distribute
-its `Star.exe` alone; its adjacent DLLs, resources and locale files are required.
+its `Targon.exe` alone; its adjacent DLLs, resources and locale files are required.
 
 `npm run smoke:desktop` runs an isolated, hidden startup check against the
 unpacked executable. To check the portable artifact, pass its path:
 
 ```powershell
-npm run smoke:desktop -- release/Star-0.1.0-portable.exe
+npm run smoke:desktop -- release/Targon-0.1.0-portable.exe
 ```
 
 The test uses a temporary user-data directory, verifies that the bundled React
@@ -98,8 +102,10 @@ does not currently mean a portable profile stored beside the executable.
 
 Profiles and friends therefore do not automatically sync between web, desktop,
 devices, or browser profiles. A backup/import feature or account-based sync
-would be additional work. Keep the desktop app ID and storage key stable when
-planning the Targon rename, and test storage migration explicitly.
+would be additional work. The Targon rename preserves the desktop data path,
+installer ID and storage key. Renaming a website's domain or subdirectory still
+changes which browser storage is accessible; it does not transfer saved data
+between different origins.
 
 The web bundle is ready for hosting; producing it does not create a public URL.
 Publishing requires choosing the hosting destination and uploading the build.

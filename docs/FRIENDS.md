@@ -1,7 +1,7 @@
 # Friends and two-chart comparisons
 
-Implemented October 18, 2026. The product is still named Star ahead of the Targon
-rename.
+Implemented October 18, 2026. The product is now named Targon, with existing
+local friend and profile storage preserved through the rename.
 
 ## User flow
 

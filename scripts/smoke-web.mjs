@@ -4,10 +4,10 @@ import { readFile } from 'node:fs/promises';
 import { unzipSync, strFromU8 } from 'fflate';
 
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
-const archive = process.argv[2] ?? new URL(`../release/Star-${pkg.version}-web.zip`, import.meta.url);
+const archive = process.argv[2] ?? new URL(`../release/Targon-${pkg.version}-web.zip`, import.meta.url);
 const files = unzipSync(new Uint8Array(await readFile(archive)));
 assert(files['index.html'], 'The archive must have index.html at its root.');
-for (const mount of ['/', '/star/']) {
+for (const mount of ['/', '/targon/', '/star/']) {
   const server = createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const name = pathname.startsWith(mount) ? pathname.slice(mount.length) || 'index.html' : '';
@@ -38,4 +38,4 @@ for (const mount of ['/', '/star/']) {
     await new Promise((accept, reject) => server.close((error) => error ? reject(error) : accept()));
   }
 }
-assert(strFromU8(files['index.html']).includes('<title>Star'));
+assert(strFromU8(files['index.html']).includes('<title>Targon'));
