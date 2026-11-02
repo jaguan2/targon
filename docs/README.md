@@ -3,6 +3,8 @@
 - [Project README](../README.md): features, installation and root commands.
 - [Architecture](ARCHITECTURE.md): source layout, module boundaries, persistence
   and the migration from the original layout.
+- [Artwork source](../frontend/src/assets/README.md): bundled sky image, origin
+  and stated usage terms.
 - [Distribution](DISTRIBUTION.md): browser and Windows builds, smoke checks and
   saved-data boundaries.
 - [Friends](FRIENDS.md): local profiles, comparisons and scoring limits.

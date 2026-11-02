@@ -7,6 +7,8 @@ const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url
 const archive = process.argv[2] ?? new URL(`../release/Targon-${pkg.version}-web.zip`, import.meta.url);
 const files = unzipSync(new Uint8Array(await readFile(archive)));
 assert(files['index.html'], 'The archive must have index.html at its root.');
+const artwork = Object.keys(files).filter((name) => /\.(?:jpe?g|png|webp)$/.test(name));
+assert(artwork.length > 0, 'The archive must include the locally bundled sky artwork.');
 for (const mount of ['/', '/targon/', '/star/']) {
   const server = createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
@@ -28,12 +30,12 @@ for (const mount of ['/', '/targon/', '/star/']) {
     const refs = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|svg))"/g)].map((match) => match[1]);
     assert(refs.some((ref) => ref.endsWith('.js')), 'Missing JavaScript entry point.');
     assert(refs.some((ref) => ref.endsWith('.css')), 'Missing stylesheet.');
-    for (const ref of refs) {
+    for (const ref of [...refs, ...artwork]) {
       const asset = await fetch(new URL(ref, base));
       assert.equal(asset.status, 200, `Asset does not load at ${mount}: ${ref}`);
       assert((await asset.arrayBuffer()).byteLength > 0);
     }
-    console.log(`Web bundle verified at ${mount}: HTML, JavaScript and CSS load over HTTP.`);
+    console.log(`Web bundle verified at ${mount}: HTML, JavaScript, CSS and sky artwork load over HTTP.`);
   } finally {
     await new Promise((accept, reject) => server.close((error) => error ? reject(error) : accept()));
   }

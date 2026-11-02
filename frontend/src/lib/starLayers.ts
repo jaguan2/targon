@@ -42,7 +42,7 @@ interface StarLayerOptions {
 export function buildStarLayer({
   count,
   seed,
-  // Matches --starlight; kept in sync with the palette in styles.css.
+  // Matches --starlight; kept in sync with the palette in styles/index.css.
   color = '#f4f7fc',
 }: StarLayerOptions): string {
   const random = seededRandom(seed);
@@ -51,8 +51,8 @@ export function buildStarLayer({
   for (let i = 0; i < count; i += 1) {
     const x = Math.round(random() * TILE_WIDTH);
     const y = Math.round(random() * TILE_HEIGHT);
-    // Roughly one star in six takes the warm tint, echoing the gold accent.
-    const tint = random() < 0.16 ? '#f4dcae' : color;
+    // Roughly one star in six takes the warm tint, echoing the lavender clouds.
+    const tint = random() < 0.16 ? '#c9c4ff' : color;
     shadows.push(`${x}px ${y}px ${tint}`);
     shadows.push(`${x}px ${y + TILE_HEIGHT}px ${tint}`);
   }

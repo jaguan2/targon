@@ -62,10 +62,6 @@ export function App() {
           </>
         )}
         {error && <p className="warning" role="alert">{error}</p>}
-        <p className="footnote">
-          Planetary positions come from an astronomical ephemeris. Accuracy depends on your birth details.
-          Compatibility readings use traditional astrological symbolism for exploration and reflection.
-        </p>
       </main>
     </>
   );

@@ -182,7 +182,6 @@ describe('Friends tab', () => {
     fill('name', 'New owner');
     submit();
     fill('date', '2001-01-01');
-    submit();
     act(() => container.querySelector<HTMLInputElement>('.unknown-time input')!.click());
     submit();
     submit();

@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { buildStarLayer } from '@/lib/starLayers';
-import nightSky from '@/assets/night-sky.webp';
+import nightSky from '@/assets/your-name-meteor-shower.jpg';
 
 /**
- * Three parallax star layers, each a single element carrying its stars as
- * box-shadows. Purely declarative — no animation loop, so the graph canvas
- * keeps the page's only requestAnimationFrame to itself.
+ * Locally bundled artwork with three subtle CSS star layers. No animation
+ * loop, so the chart keeps the page's only requestAnimationFrame to itself.
  */
 export function Starfield({ immersive = false }: { immersive?: boolean }) {
   const layers = useMemo(
@@ -19,7 +18,7 @@ export function Starfield({ immersive = false }: { immersive?: boolean }) {
 
   return (
     <div className={`starfield${immersive ? ' starfield--immersive' : ''}`} aria-hidden="true">
-      <img className="starfield__landscape" src={nightSky} alt="" fetchPriority="high" decoding="async" />
+      <img className="starfield__landscape" src={nightSky} alt="" loading="eager" decoding="async" />
       <div className="starfield__shade" />
       <div
         className="starfield__layer starfield__layer--far"

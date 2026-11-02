@@ -1,5 +1,30 @@
 # Application test report
 
+## Comet-sky frontend - November 2, 2026
+
+The refresh uses an internet-sourced *Your Name* comet-sky wallpaper, bundled
+locally with the app. The shared palette, comet identity, intake panel and
+profile/friends/compatibility surfaces have been updated. Image provenance is
+recorded in [the asset notes](../frontend/src/assets/README.md).
+
+| Check | Result |
+| --- | --- |
+| Application suite | 229 tests passed across 13 files |
+| Desktop navigation and identity | 7 tests passed |
+| TypeScript and production build | Passed |
+| Web ZIP at `/`, `/targon/` and `/star/` | Entry, scripts, styles and bundled sky image load |
+| Unpacked Windows application | Built; isolated startup, stylesheet and decoded sky image passed |
+| Local development preview | HTTP 200 |
+
+The desktop smoke check waits for the dynamically inserted background image to
+decode before asserting it loaded. This avoids racing React's image request
+against Electron's document-load event.
+
+The Windows browser visual review was stopped because the computer-use tool
+could not confidently determine Opera's current URL. No desktop/mobile visual
+acceptance result is claimed. The installer and portable artifacts were not
+rebuilt in this pass.
+
 ## Frontend reorganization - November 2, 2026
 
 The application now lives in a `frontend/` npm workspace with separate

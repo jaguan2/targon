@@ -68,7 +68,7 @@ function createWindow() {
     minWidth: 460,
     minHeight: 560,
     // Matches --void, so there is no white flash before the page paints.
-    backgroundColor: '#0c1220',
+    backgroundColor: '#070e25',
     show: false,
     autoHideMenuBar: true,
     webPreferences: {
@@ -84,14 +84,21 @@ function createWindow() {
   if (smokeReportPath) {
     window.webContents.once('did-finish-load', async () => {
       try {
-        const checks = await window.webContents.executeJavaScript(`({
+        const checks = await window.webContents.executeJavaScript(`(async () => {
+          // React inserts the image after the document starts loading. Wait
+          // for its decode rather than racing did-finish-load against it.
+          const sky = document.querySelector('.starfield__landscape');
+          if (sky) await sky.decode();
+          return {
           bundledPage: location.protocol === 'file:',
           title: document.title,
           appMounted: !!document.querySelector('.shell .masthead'),
           onboarding: !!document.querySelector('[data-intake-stage="name"]'),
-          stylesLoaded: getComputedStyle(document.documentElement).getPropertyValue('--void').trim() === '#0c1220'
-        })`);
-        if (!checks.bundledPage || !checks.appMounted || !checks.onboarding || !checks.stylesLoaded) {
+          stylesLoaded: getComputedStyle(document.documentElement).getPropertyValue('--void').trim() === '#070e25',
+          skyAssetLoaded: !!sky && sky.complete && sky.naturalWidth > 0
+          };
+        })()`);
+        if (!checks.bundledPage || !checks.appMounted || !checks.onboarding || !checks.stylesLoaded || !checks.skyAssetLoaded) {
           throw new Error('The packaged renderer did not mount correctly: ' + JSON.stringify(checks));
         }
         finishSmoke(null, checks);

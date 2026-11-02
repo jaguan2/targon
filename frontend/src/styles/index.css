@@ -1,27 +1,21 @@
-/*
- * Palette and starfield per docs/RESEARCH.md §5.
- *
- * The background is deliberately CSS-only. The node graph will own the single
- * requestAnimationFrame loop on the page; adding a second animated canvas
- * behind it is the standard way this kind of page starts dropping frames on
- * mobile.
- */
+/* Shared layout and controls. The cinematic skin lives in night-sky.css.
+ * Stars use CSS animation; the chart owns the only animation-frame loop. */
 
 :root {
-  /* Midnight surfaces, warm ivory type, and a restrained brass accent. */
-  --void: #0c1220;
-  --nebula: #151e2f;
-  /* Keep the lightest background subdued so secondary text stays readable. */
-  --horizon: #192539;
-  --starlight: #f1ebdd;
-  --gold: #d8bc80;
-  --harmony: #91cdbd;
-  --tension: #dca0af;
-  --dim: #abb4c5;
-  --surface: #111b2b;
-  --border: rgba(244, 247, 252, 0.16);
+  --void: #070e25;
+  --nebula: #111d3c;
+  --horizon: #23365c;
+  --starlight: #f0f5ff;
+  --comet: #a8ddfa;
+  /* Existing chart and control consumers share the comet accent. */
+  --gold: var(--comet);
+  --harmony: #a2e1d7;
+  --tension: #edb4d3;
+  --dim: #b5c4df;
+  --surface: rgba(11, 23, 51, 0.92);
+  --border: rgba(163, 195, 245, 0.19);
   /* Recessed fields and cards — a touch darker than the panel they sit in. */
-  --well: #0e1726;
+  --well: #0a1630;
 
   --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -765,14 +759,6 @@ table.placements td {
   margin-bottom: 1rem;
 }
 
-.footnote {
-  color: var(--dim);
-  font-size: 0.85rem;
-  line-height: 1.6;
-  text-align: center;
-  margin-top: 3rem;
-}
-
 /* Respect the OS-level motion preference — twinkling and parallax are exactly
  * the kind of thing that triggers vestibular discomfort. */
 @media (prefers-reduced-motion: reduce) {
@@ -900,7 +886,7 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 .masthead__note { max-width: 12rem; overflow-wrap: anywhere; text-align: right; line-height: 1.5; }
 .onboarding-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 7vw, 7rem); align-items: start; padding: 1rem 0; }
 .intro-hero h2 { font: 400 clamp(2.5rem, 4.4vw, 4rem)/1.13 var(--serif); letter-spacing: -0.035em; margin: 1.3rem 0; }
-.intro-hero h2 em { color: var(--gold); font-weight: 400; }
+.intro-hero h2 span { color: var(--gold); font-weight: 400; }
 .intro-hero__copy { color: var(--dim); max-width: 28rem; font-size: 0.98rem; line-height: 1.8; }
 .observatory-art { width: min(100%, 25rem); margin: 1rem auto; color: var(--gold); }
 .observatory-art svg { width: 100%; display: block; }
@@ -918,9 +904,6 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 .intake-progress--wizard button { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; width: 100%; padding: 0.2rem 0; border: 0; background: none; color: var(--dim); font: 400 0.72rem var(--sans); text-align: left; cursor: pointer; }
 .intake-progress--wizard button:disabled { cursor: default; opacity: 1; }
 .intake-progress--wizard li[aria-current='step'] button, .intake-progress--wizard li.is-complete button { color: var(--gold); }
-.intake-progress__number { font-size: 0.65rem; letter-spacing: 0.08em; }
-.birth-form--guided > .field-grid { grid-template-columns: 1fr; margin-top: 2rem; }
-.birth-form--guided h2:focus { outline: none; }
 .profile-heading h2:focus { outline: none; }
 .intake-review { border-top: 1px solid var(--border); padding-top: 1.25rem; margin: 1.5rem 0 0; display: grid; gap: 0.75rem; }
 .intake-review > div { display: flex; justify-content: space-between; gap: 1.25rem; font-size: 0.75rem; line-height: 1.6; }
@@ -943,18 +926,12 @@ input:disabled { opacity: 0.5; cursor: not-allowed; }
 .onboarding-form .chip { padding: 0.5rem 0.65rem; font-size: 0.8rem; }
 .birth-form h2 { font-size: 1.8rem; }
 .birth-form .panel__hint { line-height: 1.7; font-size: 0.85rem; margin-top: 0.75rem; }
-.birth-form__section { font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin: 1.75rem 0 1rem; }
-.birth-form__section span { margin-right: 0.6rem; color: var(--gold); }
 .field .unknown-time { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; text-transform: none; letter-spacing: 0; line-height: 1.5; padding: 0.35rem 0; cursor: pointer; }
 .unknown-time input { accent-color: var(--gold); margin: 0; flex-shrink: 0; width: 16px; height: 16px; }
 .birth-form .fieldset { margin-top: 1.5rem; }
 .city-search, .city-select { grid-column: 1 / -1; }
 .place-zone { color: var(--gold); font-size: 0.75rem; line-height: 1.8; }
 .place-zone span { color: var(--dim); margin-left: 0.3rem; }
-.intake-outcome { display: flex; align-items: center; gap: 0.8rem; border: 1px solid var(--border); padding: 0.85rem; margin-top: 1.5rem; }
-.intake-outcome > span { color: var(--gold); font-size: 1.5rem; }
-.intake-outcome p { margin: 0; color: var(--dim); font-size: 0.75rem; line-height: 1.65; }
-.intake-outcome strong { display: block; color: var(--starlight); margin-bottom: 0.2rem; font-weight: 500; }
 .profile-welcome { margin-bottom: 2.5rem; }
 .profile-heading h2 { font: 400 clamp(2.5rem, 5vw, 4rem)/1.1 var(--serif); letter-spacing: -0.03em; margin: 0.6rem 0 0; }
 .profile-layout { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 1.5rem; }
@@ -1020,7 +997,6 @@ table.placements { min-width: 34rem; font-variant-numeric: tabular-nums; }
 .rank-row__bar { margin: 0.6rem 0; }
 .friend-card { background: var(--surface); border-radius: 4px; padding: 1.5rem; }
 .friends-empty { background: transparent; border-style: dashed; }
-.footnote { text-align: left; max-width: 50rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 3rem; font-size: 0.7rem; }
 @media (max-width: 1000px) {
   .masthead__note { display: none; }
   .onboarding-layout { gap: 2.5rem; }

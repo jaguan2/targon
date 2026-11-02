@@ -2,10 +2,14 @@
 
 A birth chart, and the distances between signs.
 
-The midnight observatory refresh is implemented: a split introduction, guided
-birth intake, a profile overview, and compatibility highlights above the chart.
-First-time setup asks for name, birthday, birth time and birthplace in four
-steps, with an unknown-time option and preserved answers when going back.
+The comet-sky refresh brings a cinematic night backdrop, a blue-and-lavender
+palette, translucent intake panels, and a new comet mark to the introduction,
+profile, friends and compatibility views. The third-party artwork is bundled
+locally; see [the artwork source](frontend/src/assets/README.md).
+First-time setup has two input steps: name, then birthday with optional birth
+location and time. A final review screen confirms the details and explains any
+accuracy limits before creating the local profile. Answers are preserved when
+going back to edit.
 See [design notes](docs/DESIGN-REFRESH.md) and [verification](docs/TEST-REPORT.md).
 
 Enter your birth data and Targon computes a real natal chart from an ephemeris,

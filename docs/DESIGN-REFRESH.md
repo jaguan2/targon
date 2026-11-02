@@ -3,6 +3,58 @@
 Reviewed October 18, 2026. The product was subsequently renamed Targon on
 October 19; references to Star below describe the earlier design stages.
 
+## Two-step intake and confirmation - November 2, 2026
+
+First-time setup now collects Name, then Birth details in two input steps. The
+second screen requires only a birthday and groups optional location and time
+with a clear explanation of chart limitations. A supplied local time still
+needs a birth location or an explicit timezone to interpret it correctly.
+
+A separate Review screen shows name, any pronouns, birthday, location, time and
+timezone. Missing details are marked, and estimates or unavailable chart angles
+are explained before the final Create my profile action. Both input steps can
+be edited without losing other answers. No profile is created or saved by
+advancing to Review. Existing profile and friend editing keep two direct steps.
+The progress bar shows Name, Birth details and Review without extra numbering.
+
+## Comet-sky refresh - November 2, 2026
+
+Onboarding typography was subsequently simplified to one sans-serif family,
+with upright headings and a shared size for form headings across all four
+steps. The progress bar uses labels without duplicate numbers; the form keeps
+its step count. The extra hero slogan and global ephemeris/compatibility footer
+were removed. Calculation details remain in the profile's expandable guide.
+
+The backdrop was subsequently replaced at the owner's request with a direct
+film capture of the opening meteor shower, sourced from Animation Screencaps.
+Fine blue trails replace the oversized cyan/pink comet wallpaper. The intake
+overlay is lighter and the mobile crop is centered to show more of the film's
+original sky. Current source details are in the artwork notes linked below.
+
+The current direction is a cinematic, starry anime sky inspired by *Your Name*:
+deep cobalt, luminous cyan, lavender and a small amount of pink. At the owner's
+request, the backdrop uses an existing internet-sourced wallpaper rather than
+the initial generated landscape. See [artwork provenance](../frontend/src/assets/README.md)
+for the original download and its stated usage terms.
+
+The image is bundled locally by Vite and works offline in Electron. The intake
+view gives the sky more space, with large serif copy and a translucent navy
+form. The profile, friends and compatibility views use a darker version of the
+same backdrop, stronger reading surfaces, cool placement accents and rounded
+cards. A comet mark replaces the brass orbital drawing and favicon. The image
+is decorative; real natal and compatibility charts remain computed from inputs.
+
+`styles/index.css` owns shared layout and controls; `styles/night-sky.css` owns
+the cinematic treatment and responsive overrides. Existing reduced-motion
+rules apply to the star layers and transitions. No remote fonts or runtime
+image hotlinks were introduced. Onboarding, profile editing and saved data
+behavior are unchanged.
+
+The browser visual walkthrough was blocked when Windows computer use could not
+verify Opera's active URL. Desktop and mobile composition therefore still need
+a visual acceptance pass; automated interaction and artifact checks do not
+substitute for that review.
+
 ## Implementation update — October 19, 2026
 
 The midnight observatory refresh is now implemented. The research and original

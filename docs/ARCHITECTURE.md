@@ -15,6 +15,7 @@ device. There is no server or API layer.
 | `frontend/src/lib/` | Chart computation, scoring, saved-data codecs, form validation, geometry and catalogs |
 | `frontend/src/services/` | Browser storage reads, writes and removal |
 | `frontend/src/styles/` | Application CSS |
+| `frontend/src/assets/` | Bundled sky artwork and source attribution |
 | `frontend/src/types/` | External module declarations |
 
 Use relative imports within a folder and the `@/` alias across frontend layers.

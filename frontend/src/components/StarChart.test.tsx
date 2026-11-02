@@ -104,7 +104,7 @@ describe('App rendering', () => {
   const markup = renderToStaticMarkup(<App />);
 
   it('opens on the soft first step, not the birth form', () => {
-    expect(markup).toContain('Step 1 of 4');
+    expect(markup).toContain('Step 1 of 2');
     expect(markup).toContain('What should we call you?');
     // Birth fields belong to step two and must not be on screen yet.
     expect(markup).not.toContain('Birth date');
@@ -127,7 +127,7 @@ describe('App rendering', () => {
 });
 
 describe('Onboarding step two', () => {
-  it('greets by name and shows the birth fields', () => {
+  it('shows the combined birth fields', () => {
     const markup = renderToStaticMarkup(
       <BirthForm
         profile={{ name: 'Jason', pronouns: 'he' }}
@@ -136,13 +136,13 @@ describe('Onboarding step two', () => {
       />,
     );
     expect(markup).toContain('Step 2 of 2');
-    expect(markup).toContain('Now the sky, Jason');
+    expect(markup).toContain('Your birth details');
     expect(markup).toContain('Birth date');
     expect(markup).toContain('Chart it');
     expect(markup).toContain('Back');
   });
 
-  it('drops the greeting when no name was given', () => {
+  it('renders birth details without a name', () => {
     const markup = renderToStaticMarkup(
       <BirthForm
         profile={{ name: '', pronouns: 'unspecified' }}
@@ -150,7 +150,7 @@ describe('Onboarding step two', () => {
         onBack={() => {}}
       />,
     );
-    expect(markup).toContain('Now the sky');
-    expect(markup).not.toContain('Now the sky,');
+    expect(markup).toContain('Your birth details');
+    expect(markup).not.toContain('undefined');
   });
 });
