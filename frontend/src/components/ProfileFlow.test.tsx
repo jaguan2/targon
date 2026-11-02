@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { Simulate } from 'react-dom/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
-import { encodeSavedProfile, PROFILE_STORAGE_KEY } from '../domain/savedProfile';
+import { encodeSavedProfile, PROFILE_STORAGE_KEY } from '@/lib/savedProfile';
 
 let container: HTMLDivElement;
 let root: Root;
@@ -278,6 +278,15 @@ describe('profile lifecycle', () => {
     expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Mira');
   });
 
+  it('can create a session when reading device storage is denied', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Denied'); });
+    mount();
+    expect(container.textContent).toContain('saved profile could not be loaded');
+    createProfile();
+    expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Mira');
+    expect(container.querySelector<HTMLInputElement>('.remember-profile input')?.checked).toBe(false);
+  });
+
   it('keeps the current profile usable when saving is denied', () => {
     mount();
     createProfile();
@@ -311,6 +320,35 @@ describe('profile lifecycle', () => {
     mount();
     expect(container.querySelector('.big-three__value')?.textContent).toContain('Aries');
     expect(container.querySelector('.birth-summary')?.textContent).toContain('2000-04-01');
+  });
+
+  it('keeps edited profile changes in the session when updating storage fails', () => {
+    mount();
+    createProfile();
+    act(() => container.querySelector<HTMLInputElement>('.remember-profile input')!.click());
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Denied'); });
+    click('Edit profile');
+    fill('name', 'Nova');
+    submit();
+    fill('date', '2000-04-01');
+    submit();
+    expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Nova');
+    expect(container.querySelector('.big-three__value')?.textContent).toContain('Aries');
+    expect(container.textContent).toContain('Profile updated for this session, but the saved copy could not be updated.');
+    expect(window.localStorage.getItem(PROFILE_STORAGE_KEY)).toContain('Mira');
+    expect(window.localStorage.getItem(PROFILE_STORAGE_KEY)).not.toContain('Nova');
+  });
+
+  it('keeps a remembered profile active when its saved copy cannot be removed', () => {
+    mount();
+    createProfile();
+    act(() => container.querySelector<HTMLInputElement>('.remember-profile input')!.click());
+    vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => { throw new Error('Denied'); });
+    click('Clear profile and start over');
+    expect(container.querySelector('.profile-heading h2')?.textContent).toBe('Mira');
+    expect(container.querySelector<HTMLInputElement>('.remember-profile input')?.checked).toBe(true);
+    expect(container.textContent).toContain('saved copy could not be removed');
+    expect(window.localStorage.getItem(PROFILE_STORAGE_KEY)).toContain('Mira');
   });
 
   it('can clear a session-only profile even when storage is blocked', () => {

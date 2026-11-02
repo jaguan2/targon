@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import type { NatalChart } from '../domain/chart';
-import { getBody } from '../domain/bodies';
-import { MODE_LABELS, type CompatibilityMode } from '../domain/compatibility';
-import { formatLongitude, signFromLongitude } from '../domain/signs';
-import { compareCharts } from '../domain/synastry';
+import type { NatalChart } from '@/lib/chart';
+import { getBody } from '@/lib/bodies';
+import { MODE_LABELS, type CompatibilityMode } from '@/lib/compatibility';
+import { formatLongitude, signFromLongitude } from '@/lib/signs';
+import { compareCharts } from '@/lib/synastry';
 
 const MODES: CompatibilityMode[] = ['friendship', 'general', 'romantic'];
 

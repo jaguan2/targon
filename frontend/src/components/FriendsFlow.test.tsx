@@ -4,8 +4,8 @@ import { createRoot, type Root } from 'react-dom/client';
 import { Simulate } from 'react-dom/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
-import { decodeWorkspace } from '../domain/friends';
-import { encodeSavedProfile, PROFILE_STORAGE_KEY } from '../domain/savedProfile';
+import { decodeWorkspace } from '@/lib/friends';
+import { encodeSavedProfile, PROFILE_STORAGE_KEY } from '@/lib/savedProfile';
 
 const owner = {
   profile: { name: 'Mira', pronouns: 'they' as const },

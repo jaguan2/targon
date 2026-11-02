@@ -1,7 +1,7 @@
-import type { NatalChart } from '../domain/chart';
-import { getBody } from '../domain/bodies';
-import { formatLongitude, getSignByName } from '../domain/signs';
-import type { BodyName } from '../domain/types';
+import type { NatalChart } from '@/lib/chart';
+import { getBody } from '@/lib/bodies';
+import { formatLongitude, getSignByName } from '@/lib/signs';
+import type { BodyName } from '@/lib/types';
 
 interface Props {
   chart: NatalChart;

@@ -1,7 +1,7 @@
 # Web and Windows distribution
 
 Targon uses one React/TypeScript application for both delivery formats. Vite builds
-the static web assets in `dist/`; Electron packages those same assets into a
+the static web assets in `frontend/dist/`; Electron packages those same assets into a
 Windows application. Profile, Friends, chart calculations and comparisons run
 in both versions. No backend is needed for the current local-data features.
 
@@ -13,7 +13,9 @@ profiles and friends continue to work. See [rename notes](TARGON-RENAME.md).
 ## Development
 
 Use Node.js 22.12 or newer; `.nvmrc` selects major version 22. The installed
-Electron tooling requires that runtime. Install dependencies with `npm ci`.
+Electron tooling requires that runtime. Install dependencies with `npm ci` at
+the repository root. The frontend is an npm workspace using the root lockfile;
+the commands below also run from the root.
 
 | Command | Purpose |
 | --- | --- |
@@ -36,7 +38,7 @@ Run `npm run package:web` to create the web build and
 
 The ZIP contains `index.html` and its assets at the root. Extract it and upload
 those contents to static HTTPS hosting. Alternatively, build directly on the
-hosting provider with `npm ci` and `npm run build:web`, using `dist` as the output
+hosting provider with `npm ci` and `npm run build:web`, using `frontend/dist` as the output
 directory. Examples of suitable static hosting are documented in
 [Vite's deployment guide](https://vite.dev/guide/static-deploy.html).
 
@@ -48,10 +50,10 @@ Use HTTPS for public hosting, including secure browser APIs used for friend IDs.
 
 For a local production preview, run `npm run preview:web` and visit the printed
 loopback URL (normally port 4173). Vite preview is a verification server, not the
-public production host. Double-clicking `dist/index.html` is not the supported
+public production host. Double-clicking `frontend/dist/index.html` is not the supported
 way to run the browser version.
 
-`node scripts/smoke-web.mjs` checks the web ZIP over local HTTP at both `/` and
+`npm run smoke:web` checks the web ZIP over local HTTP at both `/` and
 `/targon/` and the previous `/star/` path, including JavaScript, stylesheet and
 favicon references. Application
 interaction tests are separate from those artifact checks.

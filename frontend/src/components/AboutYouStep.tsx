@@ -3,7 +3,7 @@ import {
   PRONOUN_SETS,
   type Profile,
   type PronounKey,
-} from '../domain/profile';
+} from '@/lib/profile';
 
 interface Props {
   initial: Profile;

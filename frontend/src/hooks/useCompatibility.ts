@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import type { NatalChart } from '../domain/chart';
+import type { NatalChart } from '@/lib/chart';
 import {
   rankSignsForChart,
   type ChartSignCompatibility,
   type CompatibilityMode,
-} from '../domain/compatibility';
+} from '@/lib/compatibility';
 
 const ALL_MODES: CompatibilityMode[] = ['general', 'romantic', 'friendship'];
 

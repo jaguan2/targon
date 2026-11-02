@@ -10,23 +10,24 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "vite",
-    "dev:web": "vite --host 127.0.0.1",
+    "dev": "npm run dev --workspace frontend",
+    "dev:web": "npm run dev --workspace frontend -- --host 127.0.0.1",
     "dev:desktop": "node scripts/desktop.mjs --dev",
-    "build": "tsc -b && vite build",
+    "build": "npm run build --workspace frontend",
     "build:web": "npm run build",
     "package:web": "npm run build:web && node scripts/package-web.mjs",
-    "preview": "vite preview",
-    "preview:web": "vite preview --host 127.0.0.1",
-    "test": "vitest run",
+    "preview": "npm run preview --workspace frontend",
+    "preview:web": "npm run preview --workspace frontend -- --host 127.0.0.1",
+    "test": "npm test --workspace frontend",
     "test:desktop": "node --test scripts/navigation.test.cjs scripts/identity.test.cjs",
     "smoke:desktop": "node scripts/smoke-desktop.mjs",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "test:watch": "npm run test:watch --workspace frontend",
+    "typecheck": "npm run typecheck --workspace frontend",
     "app": "npm run build:web && node scripts/desktop.mjs",
     "dist": "npm run dist:win",
     "dist:win": "npm run build:web && electron-builder --win --x64 --publish never",
-    "dist:dir": "npm run build:web && electron-builder --win --x64 --dir --publish never"
+    "dist:dir": "npm run build:web && electron-builder --win --x64 --dir --publish never",
+    "smoke:web": "node scripts/smoke-web.mjs"
   },
   "build": {
     "appId": "com.jason.star",
@@ -36,7 +37,7 @@
       "buildResources": "build"
     },
     "files": [
-      "dist/**/*",
+      "frontend/dist/**/*",
       "electron/**/*"
     ],
     "win": {
@@ -54,26 +55,13 @@
       "artifactName": "Targon-${version}-setup.exe"
     }
   },
-  "dependencies": {
-    "astronomy-engine": "^2.1.19",
-    "d3-force": "^3.0.0",
-    "luxon": "^3.5.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tz-lookup": "^6.1.25"
-  },
   "devDependencies": {
-    "@types/d3-force": "^3.0.10",
-    "@types/luxon": "^3.4.2",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
     "electron": "^43.4.0",
     "electron-builder": "^26.15.3",
     "fflate": "^0.8.3",
-    "jsdom": "^26.1.0",
-    "typescript": "^5.6.3",
-    "vite": "^6.0.3",
-    "vitest": "^2.1.8"
-  }
+    "vite": "^6.0.3"
+  },
+  "workspaces": [
+    "frontend"
+  ]
 }

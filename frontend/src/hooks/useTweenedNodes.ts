@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { LayoutNode, NodeId } from './layout';
+import type { LayoutNode, NodeId } from '@/lib/layout';
 
 const DURATION_MS = 700;
 

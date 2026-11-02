@@ -1,4 +1,4 @@
-import { resolveBirthMoment, type BirthInput } from '../domain/chart';
+import { resolveBirthMoment, type BirthInput } from './chart';
 import { CITIES } from './cities';
 
 export const MANUAL_PLACE = '__manual__';

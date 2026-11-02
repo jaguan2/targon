@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import type { BirthInput } from '../domain/chart';
-import { greetingName, type Profile } from '../domain/profile';
-import { CITIES } from './cities';
-import { birthFromDraft, createBirthDraft, MANUAL_PLACE, type BirthDraft } from './birthDetails';
+import type { BirthInput } from '@/lib/chart';
+import { greetingName, type Profile } from '@/lib/profile';
+import { CITIES } from '@/lib/cities';
+import { birthFromDraft, createBirthDraft, MANUAL_PLACE, type BirthDraft } from '@/lib/birthDetails';
 import tzLookup from 'tz-lookup';
 
 interface Props {

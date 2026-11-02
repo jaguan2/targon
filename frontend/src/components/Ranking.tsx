@@ -1,8 +1,8 @@
-import type { NatalChart } from '../domain/chart';
+import type { NatalChart } from '@/lib/chart';
 import {
   scoreFraction,
   type ChartSignCompatibility,
-} from '../domain/compatibility';
+} from '@/lib/compatibility';
 
 interface Props {
   chart: NatalChart;

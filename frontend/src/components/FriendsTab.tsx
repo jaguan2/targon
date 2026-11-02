@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { computeChart, type BirthInput, type NatalChart } from '../domain/chart';
-import type { FriendProfile } from '../domain/friends';
-import type { Profile } from '../domain/profile';
-import { getSignByName } from '../domain/signs';
+import { computeChart, type BirthInput, type NatalChart } from '@/lib/chart';
+import type { FriendProfile } from '@/lib/friends';
+import type { Profile } from '@/lib/profile';
+import { getSignByName } from '@/lib/signs';
 import { ChartReadout } from './ChartReadout';
 import { FriendComparison } from './FriendComparison';
 import { Onboarding } from './Onboarding';

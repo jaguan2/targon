@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL('../', import.meta.url));
+const frontend = fileURLToPath(new URL('../frontend/', import.meta.url));
 const env = { ...process.env };
 // Electron-based terminals can export this flag. Remove it for this child
 // only, so launching the app never requires editing the user's environment.
@@ -13,7 +14,7 @@ delete env.VITE_DEV_SERVER_URL;
 let server;
 if (process.argv.includes('--dev')) {
   const { createServer } = await import('vite');
-  server = await createServer({ root, clearScreen: false, server: { host: '127.0.0.1', port: 5174, strictPort: true } });
+  server = await createServer({ root: frontend, clearScreen: false, server: { host: '127.0.0.1', port: 5174, strictPort: true } });
   await server.listen();
   env.VITE_DEV_SERVER_URL = 'http://127.0.0.1:5174';
   console.log('Desktop development server: http://127.0.0.1:5174');

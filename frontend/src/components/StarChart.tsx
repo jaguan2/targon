@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import type { NatalChart } from '../domain/chart';
-import type { ChartSignCompatibility } from '../domain/compatibility';
-import { getBody } from '../domain/bodies';
-import { SIGNS, formatLongitude, getSignByName } from '../domain/signs';
-import type { AspectQuality } from '../domain/types';
+import type { NatalChart } from '@/lib/chart';
+import type { ChartSignCompatibility } from '@/lib/compatibility';
+import { getBody } from '@/lib/bodies';
+import { SIGNS, formatLongitude, getSignByName } from '@/lib/signs';
+import type { AspectQuality } from '@/lib/types';
 import {
   constellationLayout,
   edgeOpacity,
@@ -12,8 +12,8 @@ import {
   pointOnWheel,
   wheelLayout,
   type NodeId,
-} from './layout';
-import { useTweenedNodes } from './useTweenedNodes';
+} from '@/lib/layout';
+import { useTweenedNodes } from '@/hooks/useTweenedNodes';
 
 type ViewMode = 'wheel' | 'constellation';
 

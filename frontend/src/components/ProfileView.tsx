@@ -1,7 +1,7 @@
-import type { NatalChart } from '../domain/chart';
-import { greetingName, type Profile } from '../domain/profile';
+import type { NatalChart } from '@/lib/chart';
+import { greetingName, type Profile } from '@/lib/profile';
 import { ChartReadout } from './ChartReadout';
-import { CITIES } from './cities';
+import { CITIES } from '@/lib/cities';
 import { useEffect, useRef } from 'react';
 
 interface Props {

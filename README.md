@@ -71,24 +71,35 @@ for hosting, startup checks, desktop signing, and data-storage behavior.
 ## Layout
 
 ```
-src/
-  domain/          pure logic, zero UI, fully unit-tested
-    types.ts         shared vocabulary
-    signs.ts         the twelve signs: element, modality, ruler, glyph
-    bodies.ts        planets and points, with their scoring weights
-    aspects.ts       angular relationships and orbs
-    chart.ts         natal chart computation (ephemeris, angles, houses)
-    compatibility.ts the scoring model
-    profile.ts       name and pronouns — no effect on any calculation
-  ui/              React components, SVG rendering, layouts
-electron/
-  main.cjs         desktop shell
-docs/
-  RESEARCH.md      the research and design decisions behind all of it
+frontend/              React + TypeScript + Vite workspace
+  public/              static assets
+  src/
+    App.tsx            application shell and navigation
+    components/        React views and SVG rendering, with interaction tests
+    hooks/             workspace state, compatibility selection and animation
+    lib/               pure chart/scoring rules, validation, geometry and data
+    services/          browser storage boundary
+    styles/            application stylesheet
+    types/             third-party TypeScript declarations
+  package.json         frontend dependencies and scripts
+  vite.config.ts       web build and application test configuration
+electron/              desktop shell, navigation policy and application identity
+scripts/               desktop launcher, packaging and artifact smoke checks
+docs/                  architecture, feature guides, research and verification
+package.json           npm workspace, root commands and Electron packaging
 ```
 
-The domain layer has no imports from `ui/`, and is where essentially all the
-logic lives. It can be tested — and reasoned about — without rendering anything.
+This follows TaskNook's frontend organization: components render, hooks coordinate
+state, services access browser systems, and `lib/` holds pure rules. The library
+has no React or browser dependencies and can be tested without rendering anything.
+The current app runs locally without a backend.
+
+Run `npm ci` once at the repository root; npm manages the frontend workspace with
+the shared root lockfile. All commands above still work from the root. You can
+also run `npm run dev`, `npm test`, or `npm run build` from `frontend/`.
+Web builds now land in `frontend/dist/`; release artifacts remain in `release/`.
+See [architecture](docs/ARCHITECTURE.md) for module boundaries and the
+[documentation index](docs/README.md) for the other guides.
 
 ## Accuracy
 

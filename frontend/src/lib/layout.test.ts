@@ -8,13 +8,13 @@ import {
   pointOnWheel,
   wheelLayout,
 } from './layout';
-import { computeChart } from '../domain/chart';
+import { computeChart } from './chart';
 import {
   MAX_SIGN_SCORE,
   MIN_SIGN_SCORE,
   rankSignsForChart,
   scoreFraction,
-} from '../domain/compatibility';
+} from './compatibility';
 
 const chart = computeChart({
   year: 1990,

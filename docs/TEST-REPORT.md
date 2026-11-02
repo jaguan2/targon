@@ -1,5 +1,31 @@
 # Application test report
 
+## Frontend reorganization - November 2, 2026
+
+The application now lives in a `frontend/` npm workspace with separate
+components, hooks, pure library modules, browser services and styles. Profile
+state and storage handling were extracted from `App.tsx` without changing saved
+data keys or formats.
+
+| Check | Result |
+| --- | --- |
+| Clean workspace installation (`npm ci`) | Passed |
+| Application suite | 229 tests passed across 13 files |
+| Desktop navigation and identity | 7 tests passed |
+| TypeScript and production build | Passed |
+| Frontend development root | Vite discovers its config and serves the shell, modules, CSS and favicon |
+| Web ZIP at `/`, `/targon/` and `/star/` | HTML, JavaScript, CSS and favicon load |
+| Unpacked Windows application | Built successfully; isolated startup check passed |
+
+Three added interaction tests cover unavailable storage during loading, profile
+edits whose saved-copy update fails, and clearing a remembered profile when
+storage removal is denied. Existing profile and friend lifecycle tests still
+cover reloads, legacy saved data, corrupted friend recovery and comparisons.
+
+This check rebuilt the web ZIP and unpacked desktop app. Installer and portable
+release artifacts were not rebuilt in this pass. Historical release checksums
+below describe their original verification dates.
+
 ## Four-step onboarding — October 19, 2026
 
 First-time profile setup now asks for Name, Birthday, Birth time and Birthplace

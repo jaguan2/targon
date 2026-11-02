@@ -53,7 +53,7 @@ process.on('uncaughtException', (error) => {
 
 /** Set when running against the Vite dev server instead of a built bundle. */
 const devUrl = developmentUrl(process.env.VITE_DEV_SERVER_URL, app.isPackaged);
-const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+const indexPath = path.join(__dirname, '..', 'frontend', 'dist', 'index.html');
 const indexUrl = pathToFileURL(indexPath).href;
 
 function openWebLink(url) {

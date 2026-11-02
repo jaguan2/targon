@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import type { BirthInput } from '../domain/chart';
-import { EMPTY_PROFILE, type Profile } from '../domain/profile';
+import type { BirthInput } from '@/lib/chart';
+import { EMPTY_PROFILE, type Profile } from '@/lib/profile';
 import { AboutYouStep } from './AboutYouStep';
 import { BirthForm } from './BirthForm';
-import { createBirthDraft } from './birthDetails';
-import { ObservatoryArt } from './ObservatoryArt';
+import { createBirthDraft } from '@/lib/birthDetails';
 
 interface Props {
   onComplete: (profile: Profile, birth: BirthInput) => void;
@@ -53,13 +52,13 @@ export function Onboarding({ onComplete, initialProfile = EMPTY_PROFILE, initial
   return (
     <div className="onboarding-layout">
       <aside className="intro-hero">
-        <p className="step-count">A small guide to your universe</p>
-        <h2>{editing ? <>Return to<br />your beginning.</> : <>Written in the sky.<br /><em>Discovered by you.</em></>}</h2>
+        <p className="step-count"><span className="sky-spark" aria-hidden="true">✦</span> A little closer to the stars</p>
+        <h2>{editing ? <>Return to<br />your beginning.</> : <>The sky remembers<br /><em>your beginning.</em></>}</h2>
         <p className="intro-hero__copy">{step === 1
           ? 'Meet your Sun, Moon and Rising. Then explore the connections between your chart and the people in your orbit.'
           : 'A date begins the story. Your birth time and place reveal the horizon you arrived under.'}</p>
-        <ObservatoryArt />
-        <div className="intro-hero__note"><span aria-hidden="true">✧</span><p>No account needed. Your chart is calculated on your device, and saving is always your choice.</p></div>
+        <div className="sky-caption"><span aria-hidden="true" /><p>One moment. An entire universe.<br /><span>A sky that could only be yours.</span></p></div>
+        <div className="intro-hero__note"><span aria-hidden="true">✧</span><p>Just you and the stars. No account needed.<br />Calculated on your device. Saved only if you choose.</p></div>
       </aside>
       <div className="onboarding-form">
         {guided ? <ol className="intake-progress intake-progress--wizard" aria-label="Profile setup">

@@ -13,7 +13,7 @@ async function collect(directory, prefix = '') {
     else if (item.isFile()) files[name] = new Uint8Array(await readFile(join(directory, item.name)));
   }
 }
-await collect(join(root, 'dist'));
+await collect(join(root, 'frontend', 'dist'));
 if (!files['index.html']) throw new Error('No web build found. Run npm run build:web first.');
 const output = join(root, 'release', `Targon-${pkg.version}-web.zip`);
 await mkdir(join(root, 'release'), { recursive: true });

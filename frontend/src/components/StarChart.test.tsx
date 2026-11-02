@@ -3,9 +3,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { StarChart } from './StarChart';
 import { BirthForm } from './BirthForm';
 import { App } from '../App';
-import { computeChart } from '../domain/chart';
-import { rankSignsForChart } from '../domain/compatibility';
-import { SIGNS } from '../domain/signs';
+import { computeChart } from '@/lib/chart';
+import { rankSignsForChart } from '@/lib/compatibility';
+import { SIGNS } from '@/lib/signs';
 
 /**
  * Render smoke tests.

@@ -7,10 +7,10 @@ import {
   type SimulationNodeDatum,
 } from 'd3-force';
 
-import type { ChartSignCompatibility } from '../domain/compatibility';
-import { scoreFraction, scoreToDistance } from '../domain/compatibility';
-import { normalizeDegrees } from '../domain/signs';
-import type { AspectQuality, SignName } from '../domain/types';
+import type { ChartSignCompatibility } from './compatibility';
+import { scoreFraction, scoreToDistance } from './compatibility';
+import { normalizeDegrees } from './signs';
+import type { AspectQuality, SignName } from './types';
 
 /**
  * Layouts for the two views.
